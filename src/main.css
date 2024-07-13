@@ -1,3 +1,22 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+.navbar-element {
+  @apply flex justify-center items-center;
+
+}
+
+.navbar-element-icon {
+    @apply w-[50%] h-[50%];
+
+}
+
+.navbar-element-active {
+    @apply absolute left-0 top-0 bottom-0 w-[3px];
+}
+
+.navbar-element:hover .navbar-element-icon {
+    @apply text-vs-gray-800;
+}

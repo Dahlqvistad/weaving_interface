@@ -9,7 +9,7 @@ module.exports = {
                     200: '#22252a', // 34, 37, 42
                     300: '#292c34',
                     400: '#2d3035',
-                    500: '#34383e',
+                    500: '#343841',
                     600: '#757980',
                     700: '#b1b4b9',
                     800: '#d8dadf',
@@ -25,6 +25,14 @@ module.exports = {
                     'background-one': '#111215',
                 },
             },
+        },
+    },
+    variants: {
+        extend: {
+            // Enable before and after variants for backgroundColor, width, etc.
+            backgroundColor: ['before', 'active'],
+            width: ['before'],
+            inset: ['before'],
         },
     },
     plugins: [],

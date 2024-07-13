@@ -24,7 +24,7 @@ const createWindow = () => {
                 preload: path.join(__dirname, 'preload.js'),
             },
             titleBarStyle: 'default',
-            backgroundColor: '#22252a',
+            backgroundColor: '#292c34',
         });
 
         if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
@@ -38,7 +38,7 @@ const createWindow = () => {
             );
         }
 
-        // mainWindow.webContents.openDevTools();
+        mainWindow.webContents.openDevTools();
     });
 };
 

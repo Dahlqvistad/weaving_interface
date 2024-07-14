@@ -3,6 +3,9 @@ module.exports = {
     content: ['./src/**/*.{html,js,ts,tsx}'],
     theme: {
         extend: {
+            fontFamily: {
+                sans: ['Menlo', 'ui-sans-serif', 'system-ui'],
+            },
             colors: {
                 'vs-gray': {
                     100: '#111215',
@@ -23,6 +26,13 @@ module.exports = {
                     'font-two': '#b1b4b9',
                     'font-three': '#757980',
                     'background-one': '#111215',
+                    'background-two': '#22252a',
+                    'background-three': '#292c34',
+                    'background-four': '#2d3035',
+                    'background-five': '#343841',
+                    'background-six': '#757980',
+                    'background-seven': '#b1b4b9',
+                    'background-eight': '#d8dadf',
                 },
             },
         },

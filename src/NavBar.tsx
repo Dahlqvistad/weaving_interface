@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
-import { Home, Settings, FileSpreadsheet } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
+import { Home, Settings, FileSpreadsheet, Tag } from 'lucide-react';
 
 export default function NavBar(settings: { bar_width?: number }) {
-    const [activeElement, setActiveElement] = useState('Home');
-
     const configuration = {
         bar_width: settings.bar_width || 60, // px
         item_width: 100, // % of bar_width
         item_height: 100, // % of bar_width
     };
+    let activePage = useLocation().pathname;
 
     const styles = {
         width: `${
@@ -28,8 +28,9 @@ export default function NavBar(settings: { bar_width?: number }) {
                 }}
             >
                 <div>
-                    <a
-                        href="#"
+                    {/* Home */}
+                    <Link
+                        to="/"
                         className="navbar-element relative group"
                         style={{
                             width: styles.width,
@@ -39,7 +40,7 @@ export default function NavBar(settings: { bar_width?: number }) {
                         {/* Simulate the ::before pseudo-element for the active element */}
                         <div
                             className={`navbar-element-active ${
-                                activeElement === 'Home'
+                                activePage === '/'
                                     ? 'bg-vs-gray-800'
                                     : 'bg-transparent'
                             }`}
@@ -47,15 +48,15 @@ export default function NavBar(settings: { bar_width?: number }) {
 
                         <Home
                             className={`navbar-element-icon ${
-                                activeElement === 'Home'
+                                activePage === '/'
                                     ? 'text-vs-gray-800'
                                     : 'text-vs-gray-600'
                             }`}
                         />
-                    </a>
-
-                    <a
-                        href="#"
+                    </Link>
+                    {/* FileSpreadsheet */}
+                    <Link
+                        to="/spreadsheet"
                         className="navbar-element relative group"
                         style={{
                             width: styles.width,
@@ -65,7 +66,7 @@ export default function NavBar(settings: { bar_width?: number }) {
                         {/* Simulate the ::before pseudo-element for the active element */}
                         <div
                             className={`navbar-element-active ${
-                                activeElement === 'FileSpreadsheet'
+                                activePage === '/spreadsheet'
                                     ? 'bg-vs-gray-800'
                                     : 'bg-transparent'
                             }`}
@@ -73,16 +74,44 @@ export default function NavBar(settings: { bar_width?: number }) {
 
                         <FileSpreadsheet
                             className={`navbar-element-icon ${
-                                activeElement === 'FileSpreadsheet'
+                                activePage === '/spreadsheet'
                                     ? 'text-vs-gray-800'
                                     : 'text-vs-gray-600'
                             }`}
                         />
-                    </a>
+                    </Link>
+                    {/* Tag */}
+                    <Link
+                        to="/label"
+                        className="navbar-element relative group"
+                        style={{
+                            width: styles.width,
+                            height: styles.height,
+                        }}
+                    >
+                        {/* Simulate the ::before pseudo-element for the active element */}
+                        <div
+                            className={`navbar-element-active ${
+                                activePage === '/label'
+                                    ? 'bg-vs-gray-800'
+                                    : 'bg-transparent'
+                            }`}
+                        ></div>
+
+                        <Tag
+                            className={`navbar-element-icon ${
+                                activePage === '/label'
+                                    ? 'text-vs-gray-800'
+                                    : 'text-vs-gray-600'
+                            }`}
+                        />
+                    </Link>
                 </div>
+
                 <div>
-                    <a
-                        href="#"
+                    {/* Settings */}
+                    <Link
+                        to={'/settings'}
                         className="navbar-element relative group"
                         style={{
                             width: styles.width,
@@ -91,7 +120,7 @@ export default function NavBar(settings: { bar_width?: number }) {
                     >
                         <div
                             className={`navbar-element-active ${
-                                activeElement === 'Settings'
+                                activePage === '/settings'
                                     ? 'bg-vs-gray-800'
                                     : 'bg-transparent'
                             }`}
@@ -99,12 +128,12 @@ export default function NavBar(settings: { bar_width?: number }) {
 
                         <Settings
                             className={`navbar-element-icon ${
-                                activeElement === 'Settings'
+                                activePage === '/settings'
                                     ? 'text-vs-gray-800'
                                     : 'text-vs-gray-600'
                             }`}
                         />
-                    </a>
+                    </Link>
                 </div>
             </nav>
         </div>

@@ -1,5 +1,6 @@
 import { app, BrowserWindow, screen } from 'electron';
 import path from 'path';
+import 'handsontable/dist/handsontable.full.min.css';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
@@ -22,9 +23,10 @@ const createWindow = () => {
                 (externalDisplay.bounds.height - 600) / 2,
             webPreferences: {
                 preload: path.join(__dirname, 'preload.js'),
+                nodeIntegration: true,
             },
             titleBarStyle: 'default',
-            backgroundColor: '#292c34',
+            // backgroundColor: '#292c34',
         });
 
         if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {

@@ -1,0 +1,116 @@
+import React, { useState, useEffect } from 'react';
+import mill_1 from '../images/loom-animate-1.svg';
+import mill_2 from '../images/loom-animate-2.svg';
+
+interface InfoCardProps {
+    machineId: number;
+    className?: string;
+}
+
+interface MachineData {
+    id: number;
+    name: string;
+    status: number;
+    meter_idag: number;
+    driftstatus: number;
+    ip: string;
+}
+
+export default function InfoCard({ machineId, className = '' }: InfoCardProps) {
+    const [machine, setMachine] = useState<MachineData | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [currentFrame, setCurrentFrame] = useState(0);
+
+    useEffect(() => {
+        const loadMachine = async () => {
+            try {
+                const machineData = await window.dbAPI.machine.getById(
+                    machineId
+                );
+                setMachine(machineData);
+                setLoading(false);
+            } catch (error) {
+                console.error('Error loading machine:', error);
+                setLoading(false);
+            }
+        };
+
+        loadMachine();
+    }, [machineId]);
+
+    // Animation effect - only runs when machine is active
+    useEffect(() => {
+        if (!machine || !machine.status) return;
+
+        const animationInterval = setInterval(() => {
+            setCurrentFrame((prev) => (prev === 0 ? 1 : 0));
+        }, 800); // Switch every 800ms for smooth animation
+
+        return () => clearInterval(animationInterval);
+    }, [machine?.status]);
+
+    // Reset to frame 0 when machine is inactive
+    useEffect(() => {
+        if (machine && !machine.status) {
+            setCurrentFrame(0);
+        }
+    }, [machine?.status]);
+
+    if (loading) {
+        return (
+            <div
+                className={`bg-theme-background-three border border-theme-background-five rounded-lg p-4 animate-pulse ${className}`}
+            >
+                <div className="h-4 bg-theme-background-five rounded mb-2"></div>
+                <div className="h-8 bg-theme-background-five rounded mb-1"></div>
+                <div className="h-3 bg-theme-background-five rounded w-3/4"></div>
+            </div>
+        );
+    }
+
+    if (!machine) {
+        return (
+            <div
+                className={`bg-theme-background-three border border-theme-background-five rounded-lg p-4 ${className}`}
+            >
+                <p className="text-theme-font-three">Machine not found</p>
+            </div>
+        );
+    }
+
+    // Choose which image to show based on machine status and animation frame
+    const currentImage = machine.status
+        ? currentFrame === 0
+            ? mill_1
+            : mill_2
+        : mill_1;
+
+    return (
+        <div
+            className={`bg-theme-background-three border border-theme-background-five rounded-lg p-4 ${className}`}
+        >
+            <div
+                className={`flex flex-col items-center mb-4 ${
+                    machine.status ? 'bg-green-100' : 'bg-red-100'
+                }`}
+            >
+                <img
+                    src={currentImage}
+                    alt={machine.name}
+                    className="w-[350px] h-[190px] mb-2 transition-opacity duration-200"
+                />
+                <h3 className="text-theme-font-two text-sm font-medium mb-1">
+                    {machine.name}
+                </h3>
+            </div>
+
+            <p className="text-theme-font-one text-2xl font-bold">
+                {machine.meter_idag}m
+            </p>
+            <p className="text-theme-font-three text-xs mt-1">
+                Status: {machine.status ? '🟢 Aktiv' : '🔴 Stoppad'} | Drift:{' '}
+                {machine.driftstatus}%
+            </p>
+        </div>
+    );
+}

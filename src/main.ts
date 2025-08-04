@@ -1,14 +1,106 @@
 import { app, BrowserWindow, screen } from 'electron';
 import path from 'path';
 import 'handsontable/dist/handsontable.full.min.css';
+import { initDatabase } from './database/init';
+import { ipcMain } from 'electron';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
     app.quit();
 }
 
+// Add to your imports
+
+// Machine handlers
+ipcMain.handle('machine-getAll', async () => {
+    const { MachineModel } = await import('./database/models/Machine');
+    return await MachineModel.getAll();
+});
+
+ipcMain.handle('machine-getById', async (event, id) => {
+    const { MachineModel } = await import('./database/models/Machine');
+    return await MachineModel.getById(id);
+});
+
+ipcMain.handle('machine-create', async (event, data) => {
+    const { MachineModel } = await import('./database/models/Machine');
+    return await MachineModel.create(data);
+});
+
+ipcMain.handle('machine-update', async (event, id, data) => {
+    const { MachineModel } = await import('./database/models/Machine');
+    return await MachineModel.update(id, data);
+});
+
+ipcMain.handle('machine-delete', async (event, id) => {
+    const { MachineModel } = await import('./database/models/Machine');
+    return await MachineModel.delete(id);
+});
+
+// Fabric handlers
+ipcMain.handle('fabric-getAll', async () => {
+    const { FabricModel } = await import('./database/models/Fabric');
+    return await FabricModel.getAll();
+});
+
+ipcMain.handle('fabric-getById', async (event, id) => {
+    const { FabricModel } = await import('./database/models/Fabric');
+    return await FabricModel.getById(id);
+});
+
+ipcMain.handle('fabric-create', async (event, data) => {
+    const { FabricModel } = await import('./database/models/Fabric');
+    return await FabricModel.create(data);
+});
+
+ipcMain.handle('fabric-update', async (event, id, data) => {
+    const { FabricModel } = await import('./database/models/Fabric');
+    return await FabricModel.update(id, data);
+});
+
+ipcMain.handle('fabric-delete', async (event, id) => {
+    const { FabricModel } = await import('./database/models/Fabric');
+    return await FabricModel.delete(id);
+});
+
+// MachineRaw handlers
+ipcMain.handle('machineRaw-getAll', async () => {
+    const { MachineRawModel } = await import('./database/models/MachineRaw');
+    return await MachineRawModel.getAll();
+});
+
+ipcMain.handle('machineRaw-getByMachine', async (event, machineId, limit) => {
+    const { MachineRawModel } = await import('./database/models/MachineRaw');
+    return await MachineRawModel.getByMachine(machineId, limit);
+});
+
+ipcMain.handle('machineRaw-create', async (event, data) => {
+    const { MachineRawModel } = await import('./database/models/MachineRaw');
+    return await MachineRawModel.create(data);
+});
+
+ipcMain.handle(
+    'machineRaw-getByDateRange',
+    async (event, machineId, startDate, endDate) => {
+        const { MachineRawModel } = await import(
+            './database/models/MachineRaw'
+        );
+        return await MachineRawModel.getByDateRange(
+            machineId,
+            startDate,
+            endDate
+        );
+    }
+);
 const createWindow = () => {
-    app.whenReady().then(() => {
+    app.whenReady().then(async () => {
+        try {
+            await initDatabase(); // This now handles both tables AND seeding
+            console.log('Database fully initialized');
+        } catch (error) {
+            console.error('Database setup error:', error);
+        }
+
         const displays = screen.getAllDisplays();
         const externalDisplay = displays.length > 1 ? displays[1] : displays[0]; // Use the second screen if it exists, otherwise fallback to the primary screen
 

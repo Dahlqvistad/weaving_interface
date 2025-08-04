@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Created with Vectornator (http://vectornator.io/) -->
+<svg stroke-miterlimit="10" style="fill-rule:nonzero;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;"
+    version="1.1" viewBox="100 240 660 270" xml:space="preserve" xmlns="http://www.w3.org/2000/svg"
+    xmlns:xlink="http://www.w3.org/1999/xlink">
+    <defs />
+    <g id="Layer-1">
+        <g opacity="1">
+            <g opacity="1">
+                <g opacity="1">
+                    <g opacity="1">
+                        <g opacity="1">
+                            <path
+                                d="M216.069 331.453L271.415 331.453L271.415 419.863L271.415 491.022L216.069 491.022L216.069 331.453Z"
+                                fill="#539a46" fill-rule="nonzero" opacity="1" stroke="none" />
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+        <g opacity="1">
+            <g opacity="1">
+                <g opacity="1">
+                    <g opacity="1">
+                        <g opacity="1">
+                            <path
+                                d="M589.777 331.453L645.123 331.453L645.123 419.863L645.123 491.022L589.777 491.022L589.777 331.453Z"
+                                fill="#539a46" fill-rule="nonzero" opacity="1" stroke="none" />
+                        </g>
+                    </g>
+                </g>
+            </g>
+        </g>
+        <path d="M271.415 290.994L589.777 290.994L589.777 350.607L271.415 350.607L271.415 290.994Z" fill="#4c4c4c"
+            fill-rule="nonzero" opacity="1" stroke="none" />
+        <path d="M271.415 272.624L589.777 272.624L589.777 290.994L271.415 290.994L271.415 272.624Z" fill="#a4a7aa"
+            fill-rule="nonzero" opacity="1" stroke="none" />
+        <path
+            d="M334.067 244.743L347.299 244.743L347.299 263.173L347.299 281.809L334.067 281.809L334.067 260.81L334.067 244.743Z"
+            fill="#ce8f43" fill-rule="nonzero" opacity="1" stroke="none" />
+        <path
+            d="M502.729 244.743L515.961 244.743L515.961 263.173L515.961 281.809L502.729 281.809L502.729 272.461L502.729 244.743Z"
+            fill="#ce8f43" fill-rule="nonzero" opacity="1" stroke="none" />
+        <path d="M288.155 350.607L572.537 350.607L572.537 375.15L288.155 375.15L288.155 350.607Z" fill="#d0cdc8"
+            fill-rule="nonzero" opacity="1" stroke="none" />
+        <path d="M271.415 375.15L589.777 375.15L589.777 387.678L271.415 387.678L271.415 375.15Z" fill="#49883d"
+            fill-rule="nonzero" opacity="1" stroke="none" />
+        <path d="M216.069 381.414L271.415 381.414L271.415 491.121L216.069 491.022L216.069 381.414Z" fill="#417a37"
+            fill-rule="nonzero" opacity="1" stroke="none" />
+        <path d="M589.777 381.414L645.123 381.414L645.123 491.121L589.777 491.121L589.777 381.414Z" fill="#417a37"
+            fill-rule="nonzero" opacity="1" stroke="none" />
+        <path d="M288.155 387.678L572.537 387.678L572.537 436.267L288.155 436.267L288.155 387.678Z" fill="#c5c2bf"
+            fill-rule="nonzero" opacity="1" stroke="none" />
+        <path d="M271.415 448.929L288.155 448.929L288.155 459.302L271.415 459.302L271.415 448.929Z" fill="#4c4c4c"
+            fill-rule="nonzero" opacity="1" stroke="none" />
+        <path d="M572.537 448.929L589.777 448.929L589.777 459.302L572.537 459.302L572.537 448.929Z" fill="#4c4c4c"
+            fill-rule="nonzero" opacity="1" stroke="none" />
+        <path d="M288.155 436.267L572.537 436.267L572.537 454.116L288.155 454.116L288.155 436.267Z" fill="#d0cdc8"
+            fill-rule="nonzero" opacity="1" stroke="none" />
+        <path d="M288.404 454.116L572.787 454.116L572.787 471.965L288.404 471.965L288.404 454.116Z" fill="#c5c2bf"
+            fill-rule="nonzero" opacity="1" stroke="none" />
+        <path d="M106.444 350.607L216.069 350.607L216.069 371.958L106.444 371.958L106.444 350.607Z" fill="#49883d"
+            fill-rule="nonzero" opacity="1" stroke="none" />
+        <path d="M645.123 350.607L754.747 350.607L754.747 371.958L645.123 371.958L645.123 350.607Z" fill="#49883d"
+            fill-rule="nonzero" opacity="1" stroke="none" />
+
+
+    </g>
+</svg>

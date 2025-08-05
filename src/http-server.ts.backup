@@ -9,16 +9,6 @@ const host = "192.168.88.118";
 
 app.use(cors());
 app.use(express.json());
-// Debug middleware to log all requests
-app.use((req: Request, res: Response, next) => {
-    console.log(`📥 [${new Date().toISOString()}] ${req.method} ${req.url}`);
-    console.log('Headers:', req.headers);
-    console.log('Body:', req.body);
-    console.log('Client IP:', req.ip || req.connection.remoteAddress);
-    console.log('---');
-    next();
-});
-
 
 // Endpoint to receive data from ESP32 devices
 app.post('/api/machine-data', async (req: Request, res: Response) => {
@@ -56,87 +46,46 @@ app.post('/api/machine-data', async (req: Request, res: Response) => {
 
 // Device registration endpoint for ESP32 devices
 app.post('/api/register-device', async (req: Request, res: Response) => {
-    console.log('=== DEVICE REGISTRATION REQUEST RECEIVED ===');
-    console.log('Timestamp:', new Date().toISOString());
-    console.log('Request headers:', req.headers);
-    console.log('Request body:', req.body);
-    console.log('Content-Type:', req.headers['content-type']);
-    console.log('Content-Length:', req.headers['content-length']);
-    console.log('Client IP:', req.ip);
-    console.log('Remote Address:', req.connection.remoteAddress);
-    console.log('Raw body type:', typeof req.body);
-    console.log('Raw body content:', JSON.stringify(req.body, null, 2));
-    
     try {
         const { firmware_version, device_type, capabilities } = req.body;
         
-        console.log('Extracted values:');
-        console.log('- firmware_version:', firmware_version);
-        console.log('- device_type:', device_type);
-        console.log('- capabilities:', capabilities);
+        console.log('Device registration request:', req.body);
+        console.log('Client IP:', req.ip || req.connection.remoteAddress);
         
         // Find the next available machine ID
-        console.log('Fetching existing machines from database...');
         const machines = await MachineModel.getAll();
-        console.log('Existing machines count:', machines.length);
-        console.log('Existing machines:', machines.map(m => ({ id: m.id, name: m.name })));
-        
         const maxId = machines.length > 0 ? Math.max(...machines.map(m => m.id || 0)) : 0;
         const newDeviceId = maxId + 1;
         const deviceName = `Weaving-Machine-${newDeviceId}`;
         
-        console.log('Calculated new device ID:', newDeviceId);
-        console.log('Generated device name:', deviceName);
-        
-        const clientIp = req.ip || req.connection.remoteAddress || 'unknown';
-        console.log('Client IP to store:', clientIp);
-        
         // Create a new machine entry in the database
-        console.log('Creating new machine entry in database...');
-        const machineData = {
+        await MachineModel.create({
             name: deviceName,
-            ip: clientIp,
+            ip: req.ip || req.connection.remoteAddress || 'unknown',
             status: 0, // Initially inactive
             meter_idag: 0,
             driftstatus: 0
-        };
-        console.log('Machine data to create:', machineData);
+        });
         
-        const createdId = await MachineModel.create(machineData);
-        console.log('Machine created with ID:', createdId);
+        console.log(`Registered new device: ID=${newDeviceId}, Name=${deviceName}`);
         
-        console.log(`✅ Successfully registered device: ID=${newDeviceId}, Name=${deviceName}`);
-        
-        const response = {
+        res.json({
             success: true,
             message: 'Device registered successfully',
             device_id: newDeviceId,
             device_name: deviceName,
-            assigned_ip: clientIp
-        };
-        
-        console.log('Sending response:', response);
-        res.json(response);
-        console.log('=== REGISTRATION COMPLETED SUCCESSFULLY ===');
-        
+            assigned_ip: req.ip || req.connection.remoteAddress
+        });
     } catch (error: any) {
-        console.error('❌ ERROR during device registration:', error);
-        console.error('Error stack:', error.stack);
-        console.error('Error message:', error.message);
-        console.error('Error type:', typeof error);
-        
-        const errorResponse = { 
+        console.error('Error registering device:', error);
+        res.status(500).json({ 
             success: false, 
             error: 'Failed to register device',
-            message: error.message,
-            stack: error.stack
-        };
-        
-        console.log('Sending error response:', errorResponse);
-        res.status(500).json(errorResponse);
-        console.log('=== REGISTRATION FAILED ===');
+            message: error.message 
+        });
     }
 });
+
 // Health check endpoint
 app.get('/api/health', (req: Request, res: Response) => {
     res.json({ 
@@ -175,24 +124,8 @@ app.get('/api/machines', async (req: Request, res: Response) => {
 });
 
 export const startHttpServer = () => {
-    console.log('=== STARTING HTTP SERVER ===');
-    console.log('Host:', host);
-    console.log('Port:', port);
-    console.log('Full URL:', `http://${host}:${port}`);
-    
     app.listen(port, host, () => {
-        console.log(`✅ HTTP API server running on http://${host}:${port}`);
-        console.log('Available endpoints:');
-        console.log('  POST /api/register-device  - ESP32 device registration');
-        console.log('  POST /api/machine-data     - ESP32 data submission');
-        console.log('  GET  /api/health           - Health check');
-        console.log('  GET  /api/devices          - List registered devices');
-        console.log('  GET  /api/machines         - Get machine status');
-        console.log('🔄 Ready to receive data from ESP32 devices...');
-        console.log('=== SERVER STARTUP COMPLETE ===');
-    });
-    
-    app.on('error', (error) => {
-        console.error('❌ Server error:', error);
+        console.log(`HTTP API server running on http://${host}:${port}`);
+        console.log('Ready to receive data from ESP32 devices...');
     });
 };

@@ -44,7 +44,7 @@ export default function InfoCard({ machineId, className = '' }: InfoCardProps) {
 
         const animationInterval = setInterval(() => {
             setCurrentFrame((prev) => (prev === 0 ? 1 : 0));
-        }, 800); // Switch every 800ms for smooth animation
+        }, 1000); // Switch every 1000ms for smooth animation
 
         return () => clearInterval(animationInterval);
     }, [machine?.status]);

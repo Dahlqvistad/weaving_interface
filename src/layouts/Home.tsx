@@ -30,7 +30,7 @@ export default function Home() {
         loadMachines();
     }, []);
     return (
-        <div className="p-6">
+        <div className="p-6 ">
             <h1 className="text-[70px] flex justify-center font-bold text-theme-font-one mb-8">
                 {currentTime.toLocaleTimeString([], {
                     hour: '2-digit',

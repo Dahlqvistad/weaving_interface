@@ -11,7 +11,7 @@ export default function App() {
         <Router>
             <div className="flex h-screen">
                 <NavBar />
-                <div className="flex-grow overflow-auto">
+                <div className="flex-grow overflow-auto bg-theme-background-four">
                     <Routes>
                         <Route path="/" element={<Home />} />
                         <Route path="/settings" element={<Settings />} />

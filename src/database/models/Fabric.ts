@@ -1,7 +1,7 @@
 import { db } from '../connection';
 
 export interface FabricData {
-    id?: number;
+    id: number;
     name: string;
     pattern: string;
     color: string;

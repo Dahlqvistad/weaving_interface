@@ -3,7 +3,6 @@ import path from 'path';
 import 'handsontable/dist/handsontable.full.min.css';
 import { initDatabase } from './database/init';
 import { ipcMain } from 'electron';
-import { startHttpServer } from './http-server';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
@@ -95,9 +94,6 @@ const createWindow = () => {
         try {
             await initDatabase();
             console.log('Database fully initialized');
-            
-            // Start HTTP server for ESP32 communication
-            startHttpServer();
         } catch (error) {
             console.error('Database setup error:', error);
         }

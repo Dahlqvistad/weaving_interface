@@ -1,5 +1,5 @@
 import { db } from './connection';
-import { seedMachines } from './seed';
+import { seedMachines, seedMachineRawData, seedFabrics } from './seed';
 
 export const initDatabase = (): Promise<void> => {
     return new Promise((resolve, reject) => {
@@ -26,22 +26,6 @@ export const initDatabase = (): Promise<void> => {
       );
     `;
 
-        //     const createProductionTable = `
-        //   CREATE TABLE IF NOT EXISTS production (
-        //     id INTEGER PRIMARY KEY AUTOINCREMENT,
-        //     machine_id INTEGER NOT NULL,
-        //     fabric_id INTEGER NOT NULL,
-        //     date TEXT NOT NULL,
-        //     skott INTEGER NOT NULL,
-        //     meters REAL NOT NULL,
-        //     production_code TEXT,
-        //     created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-        //     FOREIGN KEY (machine_id) REFERENCES machines(id),
-        //     FOREIGN KEY (fabric_id) REFERENCES fabrics(id)
-        //   );
-
-        // `;
-
         const createMachineRawTable = `
       CREATE TABLE IF NOT EXISTS machine_raw (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -55,21 +39,6 @@ export const initDatabase = (): Promise<void> => {
         FOREIGN KEY(fabric_id) REFERENCES fabrics(id)
       );
     `;
-        //     const createProductionSummaryTable = `
-        // CREATE TABLE IF NOT EXISTS production_summary (
-        //     id INTEGER PRIMARY KEY AUTOINCREMENT,
-        //     machine_id TEXT NOT NULL,
-        //     fabric_id INTEGER,
-        //     date TEXT NOT NULL,                -- t.ex. "2025-08-03"
-        //     total_skott INTEGER NOT NULL,
-        //     meters REAL NOT NULL,
-        //     uptime_minutes INTEGER NOT NULL,   -- maskinen aktiv
-        //     downtime_minutes INTEGER NOT NULL, -- maskinen stilla
-        //     calculated_at TEXT DEFAULT CURRENT_TIMESTAMP,
-        //     FOREIGN KEY(machine_id) REFERENCES machines(id),
-        //     FOREIGN KEY(fabric_id) REFERENCES fabrics(id)
-        //     );
-        //     `;
 
         db.serialize(() => {
             let completedTables = 0;
@@ -89,6 +58,8 @@ export const initDatabase = (): Promise<void> => {
                     // Now seed the database if it's empty
                     try {
                         await seedMachines();
+                        await seedFabrics();
+                        await seedMachineRawData();
                         resolve();
                     } catch (seedError) {
                         reject(seedError);

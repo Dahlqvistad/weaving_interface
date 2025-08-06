@@ -5,7 +5,9 @@ import { MachineModel } from './database/models/Machine';
 
 const app = express();
 const port = 8080;
-const host = "192.168.88.118";
+const host = '192.168.88.118';
+const api_version = '1.0.0'; // Current API version
+const esp32_version = '1.0.3'; // Latest ESP32 firmware version
 
 app.use(cors());
 app.use(express.json());
@@ -19,14 +21,14 @@ app.use((req: Request, res: Response, next) => {
     next();
 });
 
-
 // Endpoint to receive data from ESP32 devices
 app.post('/api/machine-data', async (req: Request, res: Response) => {
     try {
-        const { machine_id, timestamp, event_type, value, fabric_id, meta } = req.body;
-        
+        const { machine_id, timestamp, event_type, value, fabric_id, meta } =
+            req.body;
+
         console.log(`Received data from ESP32-${machine_id}:`, req.body);
-        
+
         // Store raw data
         await MachineRawModel.create({
             machine_id,
@@ -34,19 +36,19 @@ app.post('/api/machine-data', async (req: Request, res: Response) => {
             event_type: event_type || 'production',
             value: value || 1,
             fabric_id,
-            meta
+            meta,
         });
-        
+
         // Update machine status and daily meter count
         const machine = await MachineModel.getById(machine_id);
         if (machine) {
             await MachineModel.update(machine_id, {
                 status: event_type === 'production' ? 1 : 0,
                 meter_idag: machine.meter_idag + (value || 0),
-                last_active: new Date().toISOString()
+                last_active: new Date().toISOString(),
             });
         }
-        
+
         res.json({ success: true, message: 'Data received and stored' });
     } catch (error: any) {
         console.error('Error processing ESP32 data:', error);
@@ -66,31 +68,37 @@ app.post('/api/register-device', async (req: Request, res: Response) => {
     console.log('Remote Address:', req.connection.remoteAddress);
     console.log('Raw body type:', typeof req.body);
     console.log('Raw body content:', JSON.stringify(req.body, null, 2));
-    
+
     try {
         const { firmware_version, device_type, capabilities } = req.body;
-        
+
         console.log('Extracted values:');
         console.log('- firmware_version:', firmware_version);
         console.log('- device_type:', device_type);
         console.log('- capabilities:', capabilities);
-        
+
         // Find the next available machine ID
         console.log('Fetching existing machines from database...');
         const machines = await MachineModel.getAll();
         console.log('Existing machines count:', machines.length);
-        console.log('Existing machines:', machines.map(m => ({ id: m.id, name: m.name })));
-        
-        const maxId = machines.length > 0 ? Math.max(...machines.map(m => m.id || 0)) : 0;
+        console.log(
+            'Existing machines:',
+            machines.map((m) => ({ id: m.id, name: m.name }))
+        );
+
+        const maxId =
+            machines.length > 0
+                ? Math.max(...machines.map((m) => m.id || 0))
+                : 0;
         const newDeviceId = maxId + 1;
         const deviceName = `Weaving-Machine-${newDeviceId}`;
-        
+
         console.log('Calculated new device ID:', newDeviceId);
         console.log('Generated device name:', deviceName);
-        
+
         const clientIp = req.ip || req.connection.remoteAddress || 'unknown';
         console.log('Client IP to store:', clientIp);
-        
+
         // Create a new machine entry in the database
         console.log('Creating new machine entry in database...');
         const machineData = {
@@ -98,40 +106,41 @@ app.post('/api/register-device', async (req: Request, res: Response) => {
             ip: clientIp,
             status: 0, // Initially inactive
             meter_idag: 0,
-            driftstatus: 0
+            driftstatus: 0,
         };
         console.log('Machine data to create:', machineData);
-        
+
         const createdId = await MachineModel.create(machineData);
         console.log('Machine created with ID:', createdId);
-        
-        console.log(`✅ Successfully registered device: ID=${newDeviceId}, Name=${deviceName}`);
-        
+
+        console.log(
+            `✅ Successfully registered device: ID=${newDeviceId}, Name=${deviceName}`
+        );
+
         const response = {
             success: true,
             message: 'Device registered successfully',
             device_id: newDeviceId,
             device_name: deviceName,
-            assigned_ip: clientIp
+            assigned_ip: clientIp,
         };
-        
+
         console.log('Sending response:', response);
         res.json(response);
         console.log('=== REGISTRATION COMPLETED SUCCESSFULLY ===');
-        
     } catch (error: any) {
         console.error('❌ ERROR during device registration:', error);
         console.error('Error stack:', error.stack);
         console.error('Error message:', error.message);
         console.error('Error type:', typeof error);
-        
-        const errorResponse = { 
-            success: false, 
+
+        const errorResponse = {
+            success: false,
             error: 'Failed to register device',
             message: error.message,
-            stack: error.stack
+            stack: error.stack,
         };
-        
+
         console.log('Sending error response:', errorResponse);
         res.status(500).json(errorResponse);
         console.log('=== REGISTRATION FAILED ===');
@@ -139,12 +148,11 @@ app.post('/api/register-device', async (req: Request, res: Response) => {
 });
 // Health check endpoint
 app.get('/api/health', (req: Request, res: Response) => {
-    res.json({ 
-        status: 'Weaving Interface API running', 
-        timestamp: new Date().toISOString() 
+    res.json({
+        status: 'Weaving Interface API running',
+        timestamp: new Date().toISOString(),
     });
 });
-
 
 // Get all registered devices
 app.get('/api/devices', async (req: Request, res: Response) => {
@@ -152,13 +160,13 @@ app.get('/api/devices', async (req: Request, res: Response) => {
         const machines = await MachineModel.getAll();
         res.json({
             success: true,
-            devices: machines.map(machine => ({
+            devices: machines.map((machine) => ({
                 device_id: machine.id,
                 device_name: machine.name,
                 ip: machine.ip,
                 status: machine.status,
-                last_active: machine.last_active
-            }))
+                last_active: machine.last_active,
+            })),
         });
     } catch (error: any) {
         res.status(500).json({ error: error.message });
@@ -174,12 +182,49 @@ app.get('/api/machines', async (req: Request, res: Response) => {
     }
 });
 
+app.get('/api/check-update/:device_id', (req, res) => {
+    const deviceId = req.params.device_id;
+    const currentVersion = req.query.current_version;
+
+    if (!currentVersion) {
+        return res.status(400).json({
+            error: 'Missing current_version query parameter',
+        });
+    }
+
+    console.log(`=== UPDATE CHECK REQUEST ===`);
+    console.log(`Device ID: ${deviceId}`);
+    console.log(`Current version: ${currentVersion}`);
+
+    // Define latest firmware version
+    const downloadUrl = `https://github.com/Dahlqvistad/Weaving-computer/releases/download/v${esp32_version}/firmware-${esp32_version}.bin`;
+
+    if (currentVersion !== esp32_version) {
+        console.log(
+            `✅ Update available: ${currentVersion} -> ${esp32_version}`
+        );
+        res.json({
+            update_available: true,
+            latest_version: esp32_version,
+            download_url: downloadUrl,
+            changelog: '20-second data intervals and improved OTA',
+        });
+    } else {
+        console.log(`✅ Device is up to date`);
+        res.json({
+            update_available: false,
+            latest_version: esp32_version,
+            current_version: currentVersion,
+        });
+    }
+});
+
 export const startHttpServer = () => {
     console.log('=== STARTING HTTP SERVER ===');
     console.log('Host:', host);
     console.log('Port:', port);
     console.log('Full URL:', `http://${host}:${port}`);
-    
+
     app.listen(port, host, () => {
         console.log(`✅ HTTP API server running on http://${host}:${port}`);
         console.log('Available endpoints:');
@@ -191,7 +236,7 @@ export const startHttpServer = () => {
         console.log('🔄 Ready to receive data from ESP32 devices...');
         console.log('=== SERVER STARTUP COMPLETE ===');
     });
-    
+
     app.on('error', (error) => {
         console.error('❌ Server error:', error);
     });

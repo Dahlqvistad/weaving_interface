@@ -233,6 +233,9 @@ export const startHttpServer = () => {
         console.log('  GET  /api/health           - Health check');
         console.log('  GET  /api/devices          - List registered devices');
         console.log('  GET  /api/machines         - Get machine status');
+        console.log(
+            '  GET  /api/check-update/:device_id - Check for firmware updates'
+        );
         console.log('🔄 Ready to receive data from ESP32 devices...');
         console.log('=== SERVER STARTUP COMPLETE ===');
     });

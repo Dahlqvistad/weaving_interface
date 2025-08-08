@@ -12,7 +12,10 @@ interface MachineData {
     name: string;
     status: number;
     meter_idag: number;
-    driftstatus: number;
+    uptime: number;
+    downtime: number;
+    fabric_id?: number;
+    meter_fabric: number;
     ip: string;
 }
 
@@ -109,7 +112,7 @@ export default function InfoCard({ machineId, className = '' }: InfoCardProps) {
             </p>
             <p className="text-theme-font-three text-xs mt-1">
                 Status: {machine.status ? '🟢 Aktiv' : '🔴 Stoppad'} | Drift:{' '}
-                {machine.driftstatus}%
+                {Math.round((machine.uptime / (machine.uptime + machine.downtime)) * 100) || 0}%
             </p>
         </div>
     );

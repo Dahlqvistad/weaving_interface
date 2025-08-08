@@ -7,7 +7,7 @@ const app = express();
 const port = 8080;
 const host = '192.168.88.118';
 const api_version = '1.0.0'; // Current API version
-const esp32_version = '1.0.8'; // Latest ESP32 firmware version
+const esp32_version = '1.0.11'; // Latest ESP32 firmware version
 
 app.use(cors());
 app.use(express.json());
@@ -21,21 +21,28 @@ app.use((req: Request, res: Response, next) => {
     next();
 });
 
+function analyzeMachineData(data: any) {
+    // Placeholder for future data analysis logic
+    console.log('Analyzing machine data:', data);
+    const machine_id = data.machine_id;
+
+    if (data.event_type === 'skott') {
+    }
+}
+
 // Endpoint to receive data from ESP32 devices
 app.post('/api/machine-data', async (req: Request, res: Response) => {
     try {
-        const { machine_id, timestamp, event_type, value, fabric_id, meta } =
-            req.body;
+        const { machine_id, timestamp, event_type, value, meta } = req.body;
 
         console.log(`Received data from ESP32-${machine_id}:`, req.body);
 
         // Store raw data
         await MachineRawModel.create({
             machine_id,
-            timestamp: timestamp || new Date().toISOString(),
-            event_type: event_type || 'production',
+            timestamp: timestamp,
+            event_type: event_type,
             value: value,
-            fabric_id,
             meta,
         });
 
@@ -44,8 +51,9 @@ app.post('/api/machine-data', async (req: Request, res: Response) => {
         if (machine) {
             await MachineModel.update(machine_id, {
                 status: event_type === 'production' ? 1 : 0,
-                meter_idag: machine.meter_idag + (value !== undefined ? value : 0),
-                last_active: new Date().toISOString(),
+                meter_idag:
+                    machine.meter_idag + (value !== undefined ? value : 0),
+                last_active: timestamp,
             });
         }
 
@@ -106,7 +114,10 @@ app.post('/api/register-device', async (req: Request, res: Response) => {
             ip: clientIp,
             status: 0, // Initially inactive
             meter_idag: 0,
-            driftstatus: 0,
+            meter_fabric: 0,
+            uptime: 0,
+            downtime: 0,
+            fabric_id: null as number | null,
         };
         console.log('Machine data to create:', machineData);
 
@@ -208,6 +219,14 @@ app.get('/api/check-update/:device_id', (req, res) => {
             latest_version: esp32_version,
             download_url: downloadUrl,
             changelog: '20-second data intervals and improved OTA',
+        });
+
+        MachineRawModel.create({
+            machine_id: parseInt(deviceId),
+            timestamp: new Date().toISOString(),
+            event_type: 'Firmware update',
+            value: 1,
+            meta: `Update check: ${currentVersion} -> ${esp32_version}`,
         });
     } else {
         console.log(`✅ Device is up to date`);

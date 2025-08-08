@@ -154,7 +154,9 @@ export const seedFabrics = async () => {
         const existingFabrics = await FabricModel.getAll();
 
         if (existingFabrics.length > 0) {
-            console.log(`Database already has ${existingFabrics.length} fabrics. Skipping fabric seed.`);
+            console.log(
+                `Database already has ${existingFabrics.length} fabrics. Skipping fabric seed.`
+            );
             return;
         }
 
@@ -166,22 +168,22 @@ export const seedFabrics = async () => {
                 pattern: 'Plain weave',
                 color: 'White',
                 width: 150.0,
-                skott_per_meter: 24.5
+                skott_per_meter: 24.5,
             },
             {
                 name: 'Linen Herringbone',
                 pattern: 'Herringbone',
                 color: 'Natural',
                 width: 140.0,
-                skott_per_meter: 28.0
+                skott_per_meter: 28.0,
             },
             {
                 name: 'Wool Twill',
                 pattern: 'Twill 2/2',
                 color: 'Gray',
                 width: 160.0,
-                skott_per_meter: 22.0
-            }
+                skott_per_meter: 22.0,
+            },
         ];
 
         for (const fabric of testFabrics) {

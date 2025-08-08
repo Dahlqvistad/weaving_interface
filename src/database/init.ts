@@ -9,9 +9,14 @@ export const initDatabase = (): Promise<void> => {
         name TEXT NOT NULL,
         last_active DATETIME DEFAULT CURRENT_TIMESTAMP,
         ip TEXT NOT NULL,
-        status INTEGER NOT NULL,
-        meter_idag INTEGER NOT NULL,
-        driftstatus INTEGER NOT NULL
+        status INTEGER NOT NULL DEFAULT 0, -- 0 = inactive, 1 = active
+        fabric_id INTEGER,
+        meter_idag INTEGER NOT NULL DEFAULT 0,
+        meter_fabric INTEGER NOT NULL DEFAULT 0,
+        uptime INTEGER NOT NULL DEFAULT 0,
+        downtime INTEGER NOT NULL DEFAULT 0,
+        FOREIGN KEY(fabric_id) REFERENCES fabrics(id)
+
       );
     `;
 
@@ -33,10 +38,8 @@ export const initDatabase = (): Promise<void> => {
         timestamp TEXT NOT NULL,
         event_type TEXT NOT NULL,
         value INTEGER NOT NULL,
-        fabric_id INTEGER,
         meta TEXT,
-        FOREIGN KEY(machine_id) REFERENCES machines(id),
-        FOREIGN KEY(fabric_id) REFERENCES fabrics(id)
+        FOREIGN KEY(machine_id) REFERENCES machines(id)
       );
     `;
 
@@ -57,9 +60,9 @@ export const initDatabase = (): Promise<void> => {
 
                     // Now seed the database if it's empty
                     try {
-                        await seedMachines();
-                        await seedFabrics();
-                        await seedMachineRawData();
+                        // await seedMachines();
+                        // await seedFabrics();
+                        // await seedMachineRawData();
                         resolve();
                     } catch (seedError) {
                         reject(seedError);

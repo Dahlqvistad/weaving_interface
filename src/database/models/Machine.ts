@@ -6,10 +6,12 @@ export interface MachineData {
     last_active?: string;
     ip: string;
     status: number;
+    fabric_id?: number; // ADD THIS
     meter_idag?: number;
-    driftstatus?: number;
+    meter_fabric?: number; // ADD THIS
+    uptime?: number; // ADD THIS
+    downtime?: number; // ADD THIS
 }
-
 export const MachineModel = {
     getAll: (): Promise<MachineData[]> => {
         return new Promise((resolve, reject) => {
@@ -32,16 +34,19 @@ export const MachineModel = {
     create: (data: Omit<MachineData, 'id'>): Promise<number> => {
         return new Promise((resolve, reject) => {
             const stmt = db.prepare(`
-        INSERT INTO machines (name, ip, status, meter_idag, driftstatus) 
-        VALUES (?, ?, ?, ?, ?)
-      `);
+                INSERT INTO machines (name, ip, status, fabric_id, meter_idag, meter_fabric, uptime, downtime) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            `);
             stmt.run(
                 [
                     data.name,
                     data.ip,
-                    data.status,
-                    data.meter_idag,
-                    data.driftstatus,
+                    data.status || 0,
+                    data.fabric_id,
+                    data.meter_idag || 0,
+                    data.meter_fabric || 0,
+                    data.uptime || 0,
+                    data.downtime || 0,
                 ],
                 function (err) {
                     if (err) reject(err);
@@ -55,22 +60,28 @@ export const MachineModel = {
     update: (id: number, data: Partial<MachineData>): Promise<void> => {
         return new Promise((resolve, reject) => {
             const stmt = db.prepare(`
-        UPDATE machines SET 
-        name = COALESCE(?, name),
-        ip = COALESCE(?, ip),
-        status = COALESCE(?, status),
-        meter_idag = COALESCE(?, meter_idag),
-        driftstatus = COALESCE(?, driftstatus),
-        last_active = CURRENT_TIMESTAMP
-        WHERE id = ?
-      `);
+                UPDATE machines SET 
+                name = COALESCE(?, name),
+                ip = COALESCE(?, ip),
+                status = COALESCE(?, status),
+                fabric_id = COALESCE(?, fabric_id),
+                meter_idag = COALESCE(?, meter_idag),
+                meter_fabric = COALESCE(?, meter_fabric),
+                uptime = COALESCE(?, uptime),
+                downtime = COALESCE(?, downtime),
+                last_active = CURRENT_TIMESTAMP
+                WHERE id = ?
+            `);
             stmt.run(
                 [
                     data.name,
                     data.ip,
                     data.status,
+                    data.fabric_id,
                     data.meter_idag,
-                    data.driftstatus,
+                    data.meter_fabric,
+                    data.uptime,
+                    data.downtime,
                     id,
                 ],
                 (err) => {

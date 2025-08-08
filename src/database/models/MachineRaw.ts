@@ -6,7 +6,6 @@ export interface MachineRawData {
     timestamp: string;
     event_type: string;
     value?: number;
-    fabric_id?: number;
     meta?: string;
 }
 
@@ -42,8 +41,8 @@ export const MachineRawModel = {
     create: (data: Omit<MachineRawData, 'id'>): Promise<number> => {
         return new Promise((resolve, reject) => {
             const stmt = db.prepare(`
-        INSERT INTO machine_raw (machine_id, timestamp, event_type, value, fabric_id, meta) 
-        VALUES (?, ?, ?, ?, ?, ?)
+        INSERT INTO machine_raw (machine_id, timestamp, event_type, value, meta) 
+        VALUES (?, ?, ?, ?, ?)
       `);
             stmt.run(
                 [
@@ -51,7 +50,6 @@ export const MachineRawModel = {
                     data.timestamp,
                     data.event_type,
                     data.value,
-                    data.fabric_id,
                     data.meta,
                 ],
                 function (err) {

@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express';
 import cors from 'cors';
 import { MachineRawModel } from './database/models/MachineRaw';
 import { MachineModel } from './database/models/Machine';
+import { WebSocketServer } from 'ws';
 
 const app = express();
 const port = 8080;
@@ -56,6 +57,8 @@ app.post('/api/machine-data', async (req: Request, res: Response) => {
         if (lastActiveDate !== currentDate) {
             MachineModel.update(machine_id, {
                 meter_idag: 0, // Reset daily meter count
+                uptime: 0,
+                downtime: 0,
             });
         }
 
@@ -64,27 +67,66 @@ app.post('/api/machine-data', async (req: Request, res: Response) => {
 
             // Determine status based on activity and current downtime
             let newStatus;
+            let newDowntime;
+            let newUptime;
+
             if (increment > 0) {
                 newStatus = 1; // Active/producing
-            } else if (machine.downtime + 1 > 12) {
-                newStatus = 2; // Offline (too much downtime)
+                newDowntime = machine.downtime; // Keep total downtime for daily stats
+                newUptime = machine.uptime + 1;
             } else {
-                newStatus = 0; // Inactive but not offline
-            }
+                // Machine is inactive this period
+                newDowntime = machine.downtime + 1;
+                newUptime = machine.uptime;
 
-            // Only increment downtime if not already offline
-            const downtimeIncrement =
-                increment === 0 && machine.status !== 2 ? 1 : 0;
+                // Check last 5 minutes (6 minutes to be safe) for consecutive zeros
+                // Check last 5 minutes (6 minutes to be safe) for consecutive zeros
+                const currentTime = new Date(timestamp); // Use ESP32's timestamp as reference
+                const fiveMinutesAgo = new Date(
+                    currentTime.getTime() - 6 * 60 * 1000
+                ).toISOString();
+                const now = timestamp; // Use ESP32's timestamp directly
+
+                const recentRecords = await MachineRawModel.getByDateRange(
+                    machine_id,
+                    fiveMinutesAgo,
+                    now
+                );
+                console.log(
+                    `Checking last 5 minutes for machine ${machine_id}:`,
+                    recentRecords[recentRecords.length - 1]
+                );
+
+                // Check if ALL recent records are zeros (offline) or if any are non-zero (active/inactive)
+                const allZeros =
+                    recentRecords.length > 0 &&
+                    recentRecords.every((record) => record.value === 0);
+                const hasNonZero = recentRecords.some(
+                    (record) => record.value > 0
+                );
+
+                if (allZeros) {
+                    newStatus = 2; // Offline (all records in last 5 minutes are zero)
+                } else if (recentRecords[recentRecords.length - 1].value == 0) {
+                    newStatus = 0; // Active (has some production in last 5 minutes)
+                } else {
+                    newStatus = 1; // Inactive but not offline
+                }
+            }
 
             await MachineModel.update(machine_id, {
                 status: newStatus,
                 meter_idag: machine.meter_idag + increment,
                 meter_fabric: machine.meter_fabric + increment,
                 last_active: timestamp,
-                uptime: machine.uptime + (increment > 0 ? 1 : 0),
-                downtime: machine.downtime + downtimeIncrement,
+                uptime: newUptime,
+                downtime: newDowntime,
             });
         }
+
+        // Get updated machine data and broadcast to frontend
+        const updatedMachine = await MachineModel.getById(machine_id);
+        broadcastMachineUpdate(updatedMachine);
 
         res.json({ success: true, message: 'Data received and stored' });
     } catch (error: any) {
@@ -292,3 +334,31 @@ export const startHttpServer = () => {
         console.error('❌ Server error:', error);
     });
 };
+
+// WebSocket server for real-time updates
+const wss = new WebSocketServer({ port: 8081 });
+const clients = new Set();
+
+wss.on('connection', (ws) => {
+    clients.add(ws);
+    console.log('Frontend connected to WebSocket');
+
+    ws.on('close', () => {
+        clients.delete(ws);
+        console.log('Frontend disconnected from WebSocket');
+    });
+});
+
+// Broadcast function
+function broadcastMachineUpdate(machineData: any) {
+    const message = JSON.stringify({
+        type: 'machine_update',
+        data: machineData,
+    });
+
+    clients.forEach((client: any) => {
+        if (client.readyState === 1) {
+            client.send(message);
+        }
+    });
+}

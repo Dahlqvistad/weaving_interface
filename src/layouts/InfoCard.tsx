@@ -39,6 +39,21 @@ export default function InfoCard({ machineId, className = '' }: InfoCardProps) {
         };
 
         loadMachine();
+
+        // WebSocket connection for real-time updates
+        const ws = new WebSocket('ws://192.168.88.118:8081');
+
+        ws.onmessage = (event) => {
+            const message = JSON.parse(event.data);
+            if (
+                message.type === 'machine_update' &&
+                message.data.id === machineId
+            ) {
+                setMachine(message.data);
+            }
+        };
+
+        return () => ws.close();
     }, [machineId]);
 
     // Animation effect - only runs when machine is active
@@ -112,7 +127,10 @@ export default function InfoCard({ machineId, className = '' }: InfoCardProps) {
             </p>
             <p className="text-theme-font-three text-xs mt-1">
                 Status: {machine.status ? '🟢 Aktiv' : '🔴 Stoppad'} | Drift:{' '}
-                {Math.round((machine.uptime / (machine.uptime + machine.downtime)) * 100) || 0}%
+                {Math.round(
+                    (machine.uptime / (machine.uptime + machine.downtime)) * 100
+                ) || 0}
+                %
             </p>
         </div>
     );

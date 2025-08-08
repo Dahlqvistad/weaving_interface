@@ -7,7 +7,7 @@ const app = express();
 const port = 8080;
 const host = '192.168.88.118';
 const api_version = '1.0.0'; // Current API version
-const esp32_version = '1.0.3'; // Latest ESP32 firmware version
+const esp32_version = '1.0.8'; // Latest ESP32 firmware version
 
 app.use(cors());
 app.use(express.json());
@@ -34,7 +34,7 @@ app.post('/api/machine-data', async (req: Request, res: Response) => {
             machine_id,
             timestamp: timestamp || new Date().toISOString(),
             event_type: event_type || 'production',
-            value: value || 1,
+            value: value,
             fabric_id,
             meta,
         });
@@ -44,7 +44,7 @@ app.post('/api/machine-data', async (req: Request, res: Response) => {
         if (machine) {
             await MachineModel.update(machine_id, {
                 status: event_type === 'production' ? 1 : 0,
-                meter_idag: machine.meter_idag + (value || 0),
+                meter_idag: machine.meter_idag + (value !== undefined ? value : 0),
                 last_active: new Date().toISOString(),
             });
         }

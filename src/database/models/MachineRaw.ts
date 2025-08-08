@@ -50,7 +50,7 @@ export const MachineRawModel = {
                     data.machine_id,
                     data.timestamp,
                     data.event_type,
-                    data.value || 1,
+                    data.value,
                     data.fabric_id,
                     data.meta,
                 ],

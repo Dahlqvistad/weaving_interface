@@ -34,6 +34,7 @@ function analyzeMachineData(data: any) {
 app.post('/api/machine-data', async (req: Request, res: Response) => {
     try {
         const { machine_id, timestamp, event_type, value, meta } = req.body;
+        const analysis = analyzeMachineData(req.body);
 
         console.log(`Received data from ESP32-${machine_id}:`, req.body);
 
@@ -48,12 +49,40 @@ app.post('/api/machine-data', async (req: Request, res: Response) => {
 
         // Update machine status and daily meter count
         const machine = await MachineModel.getById(machine_id);
+
+        const lastActiveDate = new Date(machine.last_active).toDateString();
+        const currentDate = new Date(timestamp).toDateString();
+
+        if (lastActiveDate !== currentDate) {
+            MachineModel.update(machine_id, {
+                meter_idag: 0, // Reset daily meter count
+            });
+        }
+
         if (machine) {
+            const increment = value !== undefined ? value : 0;
+
+            // Determine status based on activity and current downtime
+            let newStatus;
+            if (increment > 0) {
+                newStatus = 1; // Active/producing
+            } else if (machine.downtime + 1 > 12) {
+                newStatus = 2; // Offline (too much downtime)
+            } else {
+                newStatus = 0; // Inactive but not offline
+            }
+
+            // Only increment downtime if not already offline
+            const downtimeIncrement =
+                increment === 0 && machine.status !== 2 ? 1 : 0;
+
             await MachineModel.update(machine_id, {
-                status: event_type === 'production' ? 1 : 0,
-                meter_idag:
-                    machine.meter_idag + (value !== undefined ? value : 0),
+                status: newStatus,
+                meter_idag: machine.meter_idag + increment,
+                meter_fabric: machine.meter_fabric + increment,
                 last_active: timestamp,
+                uptime: machine.uptime + (increment > 0 ? 1 : 0),
+                downtime: machine.downtime + downtimeIncrement,
             });
         }
 

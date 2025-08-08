@@ -69,7 +69,7 @@ export const MachineModel = {
                 meter_fabric = COALESCE(?, meter_fabric),
                 uptime = COALESCE(?, uptime),
                 downtime = COALESCE(?, downtime),
-                last_active = CURRENT_TIMESTAMP
+                last_active = COALESCE(?, last_active)
                 WHERE id = ?
             `);
             stmt.run(
@@ -82,6 +82,7 @@ export const MachineModel = {
                     data.meter_fabric,
                     data.uptime,
                     data.downtime,
+                    data.last_active,
                     id,
                 ],
                 (err) => {

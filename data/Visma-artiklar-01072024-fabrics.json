@@ -1,0 +1,23 @@
+{
+    "Skåne": {
+        "name": "Skåne metervara bredd 175",
+        "width": 175,
+        "skott_per_meter": 1300,
+        "colors": {
+            "röd": "3997",
+            "mörkblå": "3950",
+            "svart": "4001",
+            "olivgrön": "4000",
+            "gul": "3996",
+            "gammelrosa": "3932",
+            "vit": "3626",
+            "stålgrå": "3625",
+            "sand": "3624",
+            "plommon": "3623",
+            "natur": "3630",
+            "ljusgrön": "3629",
+            "ljusblå": "3628",
+            "linne": "3627"
+        }
+    }
+}

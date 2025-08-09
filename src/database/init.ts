@@ -14,20 +14,7 @@ export const initDatabase = (): Promise<void> => {
         skott_idag INTEGER NOT NULL DEFAULT 0,
         skott_fabric INTEGER NOT NULL DEFAULT 0,
         uptime INTEGER NOT NULL DEFAULT 0,
-        downtime INTEGER NOT NULL DEFAULT 0,
-        FOREIGN KEY(fabric_id) REFERENCES fabrics(id)
-
-      );
-    `;
-
-        const createFabricsTable = `
-      CREATE TABLE IF NOT EXISTS fabrics (
-        id INTEGER PRIMARY KEY,
-        name TEXT NOT NULL,
-        pattern TEXT NOT NULL,
-        color TEXT NOT NULL,
-        width REAL NOT NULL,
-        skott_per_meter REAL NOT NULL
+        downtime INTEGER NOT NULL DEFAULT 0
       );
     `;
 
@@ -45,7 +32,7 @@ export const initDatabase = (): Promise<void> => {
 
         db.serialize(() => {
             let completedTables = 0;
-            const totalTables = 3;
+            const totalTables = 2; // Changed from 3 to 2
             let hasError = false;
 
             const checkCompletion = async (err?: Error) => {
@@ -61,7 +48,7 @@ export const initDatabase = (): Promise<void> => {
                     // Now seed the database if it's empty
                     try {
                         // await seedMachines();
-                        // await seedFabrics();
+                        // await seedFabrics(); // This will now create JSON file
                         // await seedMachineRawData();
                         resolve();
                     } catch (seedError) {
@@ -71,8 +58,8 @@ export const initDatabase = (): Promise<void> => {
             };
 
             db.run(createMachinesTable, checkCompletion);
-            db.run(createFabricsTable, checkCompletion);
             db.run(createMachineRawTable, checkCompletion);
+            // Removed: db.run(createFabricsTable, checkCompletion);
         });
     });
 };

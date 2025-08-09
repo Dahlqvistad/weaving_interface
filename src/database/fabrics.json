@@ -1,0 +1,18 @@
+{
+    "skåne": {
+        "name": "Skåne metervara bredd 150",
+        "width": 150,
+        "skott_per_meter": 1300,
+        "colors": {
+            "vit": 3634,
+            "stålgrå": 3633,
+            "sand": 3632,
+            "plommon": 3631,
+            "natur": 3630,
+            "ljusgrön": 3629,
+            "ljusblå": 3628,
+            "linne": 3627
+        }
+    }
+
+}

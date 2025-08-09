@@ -1,0 +1,183 @@
+const XLSX = require('xlsx');
+const fs = require('fs');
+const path = require('path');
+
+function parseXlsxToFabrics(filePath) {
+    try {
+        // Read the Excel file
+        const workbook = XLSX.readFile(filePath);
+        const sheetName = workbook.SheetNames[0]; // Use first sheet
+        const worksheet = workbook.Sheets[sheetName];
+        
+        // Convert to JSON with header row
+        const data = XLSX.utils.sheet_to_json(worksheet);
+        
+        console.log(`Found ${data.length} rows in the Excel file`);
+        console.log('Sample headers:', Object.keys(data[0] || {}));
+        
+        const fabrics = {};
+        let processedCount = 0;
+        let skippedCount = 0;
+        
+        data.forEach((row, index) => {
+            const artikelnummer = row['Artikelnummer'];
+            const name = row['Benämning'];
+            const ilager = row['I lager'];
+            
+            // Skip if no name or doesn't contain "metervara"
+            if (!name || !name.toLowerCase().includes('metervara')) {
+                return;
+            }
+            
+            console.log(`Processing row ${index + 2}: ${name}`);
+            
+            // Parse the name using regex to extract pattern, width, and color
+            // Pattern: "{pattern} metervara bredd {width} cm, {color}"
+            const nameRegex = /^(.+?)\s+metervara\s+bredd\s+(\d+)\s*cm,\s*(.+)$/i;
+            const match = name.match(nameRegex);
+            
+            if (!match) {
+                console.log(`Could not parse: "${name}"`);
+                skippedCount++;
+                return;
+            }
+            
+            const [, pattern, width, color] = match;
+            const cleanPattern = pattern.trim().toLowerCase();
+            const cleanColor = color.trim().toLowerCase();
+            const numericWidth = parseInt(width);
+            const quantity = parseFloat(ilager) || 0;
+            
+            console.log(`  Pattern: "${cleanPattern}", Width: ${numericWidth}, Color: "${cleanColor}", Quantity: ${quantity}`);
+            
+            // Initialize pattern if it doesn't exist
+            if (!fabrics[cleanPattern]) {
+                fabrics[cleanPattern] = {};
+            }
+            
+            // Initialize width if it doesn't exist
+            const widthKey = width.toString();
+            if (!fabrics[cleanPattern][widthKey]) {
+                fabrics[cleanPattern][widthKey] = {
+                    name: `${pattern.trim()} metervara bredd ${numericWidth} cm`,
+                    width: numericWidth,
+                    skott_per_meter: 1300, // Default value, adjust as needed
+                    colors: {}
+                };
+            }
+            
+            // Add color to the pattern and width
+            fabrics[cleanPattern][widthKey].colors[cleanColor] = parseInt(artikelnummer);
+            
+            processedCount++;
+        });
+        
+        console.log(`\nProcessing complete!`);
+        console.log(`Processed: ${processedCount} articles`);
+        console.log(`Skipped: ${skippedCount} articles`);
+        console.log(`Found ${Object.keys(fabrics).length} unique patterns`);
+        
+        return fabrics;
+        
+    } catch (error) {
+        console.error('Error processing Excel file:', error);
+        return null;
+    }
+}
+
+// Custom JSON stringify to preserve numeric keys
+function customStringify(obj, indent = 4) {
+    const space = ' '.repeat(indent);
+    let result = '{\n';
+    
+    const patterns = Object.keys(obj);
+    patterns.forEach((pattern, patternIndex) => {
+        result += `${space}"${pattern}": {\n`;
+        
+        const widths = Object.keys(obj[pattern]).sort((a, b) => parseInt(a) - parseInt(b));
+        widths.forEach((width, widthIndex) => {
+            const fabricData = obj[pattern][width];
+            result += `${space}${space}"${width}": {\n`;
+            result += `${space}${space}${space}"name": "${fabricData.name}",\n`;
+            result += `${space}${space}${space}"width": ${fabricData.width},\n`;
+            result += `${space}${space}${space}"skott_per_meter": ${fabricData.skott_per_meter},\n`;
+            result += `${space}${space}${space}"colors": {\n`;
+            
+            const colors = Object.keys(fabricData.colors);
+            colors.forEach((color, colorIndex) => {
+                const articleNum = fabricData.colors[color];
+                const comma = colorIndex < colors.length - 1 ? ',' : '';
+                result += `${space}${space}${space}${space}"${color}": ${articleNum}${comma}\n`;
+            });
+            
+            result += `${space}${space}${space}}\n`;
+            const comma = widthIndex < widths.length - 1 ? ',' : '';
+            result += `${space}${space}}${comma}\n`;
+        });
+        
+        const comma = patternIndex < patterns.length - 1 ? ',' : '';
+        result += `${space}}${comma}\n`;
+    });
+    
+    result += '}';
+    return result;
+}
+
+// Get command line arguments
+const args = process.argv.slice(2);
+if (args.length === 0) {
+    console.log('Usage: node parse-xlsx.js <path-to-xlsx-file> [output-file]');
+    console.log('Example: node parse-xlsx.js data/Visma-artiklar-01072024.xlsx data/fabrics.json');
+    process.exit(1);
+}
+
+const inputFile = args[0];
+const outputFile = args[1] || 'fabrics.json';
+
+// Check if input file exists
+if (!fs.existsSync(inputFile)) {
+    console.error(`Input file not found: ${inputFile}`);
+    process.exit(1);
+}
+
+console.log(`Parsing: ${inputFile}`);
+console.log(`Output will be saved to: ${outputFile}`);
+
+const fabrics = parseXlsxToFabrics(inputFile);
+
+if (fabrics) {
+    // Create output directory if it doesn't exist
+    const outputDir = path.dirname(outputFile);
+    if (!fs.existsSync(outputDir)) {
+        fs.mkdirSync(outputDir, { recursive: true });
+    }
+    
+    // Write to JSON file with custom formatting
+    fs.writeFileSync(outputFile, customStringify(fabrics));
+    console.log(`\nResults saved to: ${outputFile}`);
+    
+    // Show a preview
+    console.log('\nPreview of results:');
+    Object.keys(fabrics).slice(0, 2).forEach(pattern => {
+        console.log(`\n"${pattern}": {`);
+        Object.keys(fabrics[pattern]).forEach(width => {
+            console.log(`  ${width}: {`);
+            console.log(`    "name": "${fabrics[pattern][width].name}",`);
+            console.log(`    "width": ${fabrics[pattern][width].width},`);
+            console.log(`    "skott_per_meter": ${fabrics[pattern][width].skott_per_meter},`);
+            console.log(`    "colors": {`);
+            Object.entries(fabrics[pattern][width].colors).slice(0, 3).forEach(([color, articleNum]) => {
+                console.log(`      "${color}": ${articleNum},`);
+            });
+            if (Object.keys(fabrics[pattern][width].colors).length > 3) {
+                console.log(`      ... and ${Object.keys(fabrics[pattern][width].colors).length - 3} more colors`);
+            }
+            console.log(`    }`);
+            console.log(`  },`);
+        });
+        console.log(`}`);
+    });
+} else {
+    console.error('Failed to parse the Excel file');
+    process.exit(1);
+}

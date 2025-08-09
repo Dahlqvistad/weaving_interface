@@ -1,0 +1,695 @@
+{
+    "kattvik": {
+        "40": {
+            "name": "Kattvik metervara bredd 40 cm",
+            "width": 40,
+            "skott_per_meter": 1300,
+            "colors": {
+                "brun/natur": 5383,
+                "vit": 4439,
+                "vinröd/stålgrå": 3772,
+                "stålgrå/ljusgrå": 1799,
+                "sand/natur": 1797,
+                "röd/stålgrå": 1796,
+                "mörkblå/röd/oblekt": 1795,
+                "gul/ljusgrön": 1794
+            }
+        }
+    },
+    "skanör": {
+        "130": {
+            "name": "Skanör metervara bredd 130 cm",
+            "width": 130,
+            "skott_per_meter": 1300,
+            "colors": {
+                "röd/svart/oblekt": 5326,
+                "röd/svart/vit": 5325
+            }
+        },
+        "150": {
+            "name": "Skanör metervara bredd 150 cm",
+            "width": 150,
+            "skott_per_meter": 1300,
+            "colors": {
+                "röd/svart/oblekt": 5324,
+                "röd/svart/vit": 5323
+            }
+        }
+    },
+    "kattegatt": {
+        "50": {
+            "name": "Kattegatt metervara bredd 50 cm",
+            "width": 50,
+            "skott_per_meter": 1300,
+            "colors": {
+                "vit": 4879,
+                "vinröd": 4878,
+                "tallgrön": 4877,
+                "orange": 4876,
+                "olivgrön": 4875,
+                "oblekt": 4874,
+                "natur": 4873,
+                "mörkblå": 4872,
+                "ljusgrå": 4871,
+                "linne": 4870,
+                "lime": 4869,
+                "halmgul": 4868,
+                "brun": 4867
+            }
+        },
+        "90": {
+            "name": "Kattegatt metervara bredd 90 cm",
+            "width": 90,
+            "skott_per_meter": 1300,
+            "colors": {
+                "vit": 4892,
+                "vinröd": 4891,
+                "tallgrön": 4890,
+                "orange": 4889,
+                "olivgrön": 4888,
+                "oblekt": 4887,
+                "natur": 4886,
+                "mörkblå": 4885,
+                "ljusgrå": 4884,
+                "linne": 4883,
+                "lime": 4882,
+                "halmgul": 4881,
+                "brun": 4880
+            }
+        },
+        "130": {
+            "name": "Kattegatt metervara bredd 130 cm",
+            "width": 130,
+            "skott_per_meter": 1300,
+            "colors": {
+                "röd (färgad)": 5277,
+                "oblekt mörkblå": 5276,
+                "vinröd": 5058,
+                "tallgrön": 5057,
+                "olivgrön": 5056,
+                "oblekt": 5055,
+                "ljusgrå": 5054,
+                "lime": 5053,
+                "halmgul": 5052,
+                "svart": 4898,
+                "oblekt rosa": 4897,
+                "orange": 4896,
+                "ljusblå": 4895,
+                "oblekt gul": 4894,
+                "vit": 3596,
+                "oblekt svart": 3595,
+                "oblekt orange": 3594,
+                "natur": 3593,
+                "mörkblå": 3592,
+                "ljusgrön": 3591,
+                "oblekt ljusblå": 3590,
+                "linne": 3589,
+                "gul": 3588,
+                "gammelrosa": 3587,
+                "brun": 3586
+            }
+        },
+        "150": {
+            "name": "Kattegatt metervara bredd 150 cm",
+            "width": 150,
+            "skott_per_meter": 1300,
+            "colors": {
+                "plommon": 5292,
+                "vinröd": 4832,
+                "tallgrön": 4831,
+                "olivgrön": 4830,
+                "ljusgrå": 4829,
+                "lime": 4828,
+                "halmgul": 4827,
+                "stålgrå": 4004,
+                "röd": 3951,
+                "oblekt": 3933,
+                "vit": 3607,
+                "svart": 3606,
+                "orange": 3605,
+                "natur": 3604,
+                "mörkblå": 3603,
+                "ljusgrön": 3602,
+                "ljusblå": 3601,
+                "linne": 3600,
+                "gul": 3599,
+                "gammelrosa": 3598,
+                "brun": 3597
+            }
+        },
+        "175": {
+            "name": "Kattegatt metervara bredd 175 cm",
+            "width": 175,
+            "skott_per_meter": 1300,
+            "colors": {
+                "vinröd": 5051,
+                "olivgrön": 5050,
+                "oblekt": 5049,
+                "ljusgrå": 5048,
+                "lime": 5047,
+                "brun vit (special)": 4900,
+                "halmgul": 4899,
+                "plommon": 4007,
+                "röd": 4006,
+                "tallgrön": 3952,
+                "vit": 3618,
+                "svart": 3617,
+                "orange": 3616,
+                "natur": 3615,
+                "mörkblå": 3614,
+                "ljusgrön": 3613,
+                "ljusblå": 3612,
+                "linne": 3611,
+                "gul": 3610,
+                "gammelrosa": 3609,
+                "brun": 3608
+            }
+        }
+    },
+    "hov": {
+        "130": {
+            "name": "Hov metervara bredd 130 cm",
+            "width": 130,
+            "skott_per_meter": 1300,
+            "colors": {
+                "natur/röd/svart": 5233,
+                "vit/blå/gul": 3584
+            }
+        },
+        "150": {
+            "name": "Hov metervara bredd 150 cm",
+            "width": 150,
+            "skott_per_meter": 1300,
+            "colors": {
+                "natur/röd/svart": 5234,
+                "vit/blå/gul": 3585
+            }
+        }
+    },
+    "småryd": {
+        "30": {
+            "name": "Småryd metervara bredd 30 cm",
+            "width": 30,
+            "skott_per_meter": 1300,
+            "colors": {
+                "stålgrå": 3918,
+                "sand": 3917,
+                "röd": 3916,
+                "plommon": 3915,
+                "ljusgrön": 3914,
+                "lila": 3913,
+                "koboltblå": 3912,
+                "brun": 3911
+            }
+        },
+        "50": {
+            "name": "Småryd metervara bredd 50 cm",
+            "width": 50,
+            "skott_per_meter": 1300,
+            "colors": {
+                "oblekt": 4866
+            }
+        }
+    },
+    "viken": {
+        "30": {
+            "name": "Viken metervara bredd 30 cm",
+            "width": 30,
+            "skott_per_meter": 1300,
+            "colors": {
+                "stålgrå": 4864,
+                "orange": 4863,
+                "merlotröd": 4862,
+                "merlotröd/stålgrå": 3955,
+                "tallgrön": 3954,
+                "havsblå": 3953,
+                "vit/svart": 3910,
+                "vit/natur": 3909,
+                "svart/natur": 3908
+            }
+        },
+        "50": {
+            "name": "Viken metervara bredd 50 cm",
+            "width": 50,
+            "skott_per_meter": 1300,
+            "colors": {
+                "stålgrå": 4861,
+                "orange": 4860,
+                "merlotröd": 4859,
+                "tallgrön": 3957,
+                "havsblå": 3956,
+                "vit/svart": 3907,
+                "vit/natur": 3906,
+                "svart/natur": 3905
+            }
+        }
+    },
+    "gåsöga": {
+        "50": {
+            "name": "Gåsöga metervara bredd 50 cm",
+            "width": 50,
+            "skott_per_meter": 1300,
+            "colors": {
+                "plommon": 3824,
+                "gul": 3818,
+                "vit": 3828,
+                "stålgrå": 3827,
+                "röd": 3826,
+                "rosa": 3825,
+                "mörkbrun": 3823,
+                "mörkblå": 3822,
+                "ljusgrön": 3821,
+                "ljusblå": 3820,
+                "linne": 3819
+            }
+        }
+    },
+    "rutan": {
+        "130": {
+            "name": "Rutan metervara bredd 130 cm",
+            "width": 130,
+            "skott_per_meter": 1300,
+            "colors": {
+                "sand": 4833,
+                "mörkbrun": 3985,
+                "gul": 3944,
+                "orange": 3943,
+                "vit": 3650,
+                "svart": 3649,
+                "stålgrå": 3648,
+                "röd": 3647,
+                "natur": 3646,
+                "ljusblå": 3645,
+                "linne": 3644,
+                "ljusgrön": 3643
+            }
+        },
+        "150": {
+            "name": "Rutan metervara bredd 150 cm",
+            "width": 150,
+            "skott_per_meter": 1300,
+            "colors": {
+                "sand": 4855,
+                "orange": 3986,
+                "mörkbrun": 3963,
+                "vit": 3658,
+                "svart": 3657,
+                "stålgrå": 3656,
+                "röd": 3655,
+                "natur": 3654,
+                "ljusblå": 3653,
+                "linne": 3652,
+                "ljusgrön": 3651
+            }
+        }
+    },
+    "clublinne": {
+        "50": {
+            "name": "Clublinne metervara bredd 50 cm",
+            "width": 50,
+            "skott_per_meter": 1300,
+            "colors": {
+                "koboltblå": 4850,
+                "gammelrosa": 3988,
+                "svart": 3931,
+                "röd": 3930,
+                "oblekt": 3929,
+                "vit": 3880,
+                "stålgrå": 3879,
+                "natur": 3878,
+                "mörkblå": 3877,
+                "ljusgrön": 3876,
+                "ljusblå": 3875,
+                "linne": 3874,
+                "gul": 3873
+            }
+        },
+        "130": {
+            "name": "Clublinne metervara bredd 130 cm",
+            "width": 130,
+            "skott_per_meter": 1300,
+            "colors": {
+                "mörkblå": 4844,
+                "stålgrå": 4843,
+                "koboltblå": 4842,
+                "gammalrosa": 4841,
+                "svart": 3989,
+                "oblekt": 3948,
+                "röd": 3947,
+                "vit": 3572,
+                "natur": 3571,
+                "ljusgrön": 3570,
+                "ljusblå": 3569,
+                "linne": 3568,
+                "gul": 3567
+            }
+        },
+        "150": {
+            "name": "Clublinne metervara bredd 150 cm",
+            "width": 150,
+            "skott_per_meter": 1300,
+            "colors": {
+                "mörkblå": 4849,
+                "stålgrå": 4848,
+                "röd": 4847,
+                "koboltblå": 4846,
+                "gammalrosa": 4845,
+                "rosa": 3990,
+                "plommon": 3949,
+                "vit": 3578,
+                "natur": 3577,
+                "ljusgrön": 3576,
+                "ljusblå": 3575,
+                "linne": 3574,
+                "gul": 3573
+            }
+        }
+    },
+    "herrgårdsrutan": {
+        "90": {
+            "name": "Herrgårdsrutan metervara bredd 90 cm",
+            "width": 90,
+            "skott_per_meter": 1300,
+            "colors": {
+                "vit": 3864,
+                "ljusgrå": 3863,
+                "röd": 3862,
+                "plommon": 3861,
+                "natur": 3860,
+                "mörkblå": 3859,
+                "linne": 3858,
+                "gammelrosa": 3857,
+                "brun": 3853,
+                "ljusblå": 1961,
+                "gul": 1960
+            }
+        },
+        "150": {
+            "name": "Herrgårdsrutan metervara bredd 150 cm",
+            "width": 150,
+            "skott_per_meter": 1300,
+            "colors": {
+                "vinröd": 4027,
+                "gul": 3979,
+                "ljusgrön": 3978,
+                "ljusblå": 3977,
+                "vit": 3743,
+                "stålgrå": 3742,
+                "röd": 3741,
+                "plommon": 3740,
+                "natur": 3739,
+                "linne": 3738,
+                "gammelrosa": 3737,
+                "mörkblå": 1741,
+                "brun": 1736
+            }
+        },
+        "175": {
+            "name": "Herrgårdsrutan metervara bredd 175 cm",
+            "width": 175,
+            "skott_per_meter": 1300,
+            "colors": {
+                "ljusblå": 3982,
+                "ljusgrön": 3981,
+                "gul": 3980,
+                "vit": 3736,
+                "stålgrå": 3735,
+                "röd": 3734,
+                "plommon": 3733,
+                "natur": 3732,
+                "mörkblå": 3731,
+                "linne": 3730,
+                "gammelrosa": 3729,
+                "brun": 1737
+            }
+        }
+    },
+    "sofiero": {
+        "150": {
+            "name": "Sofiero metervara bredd 150 cm",
+            "width": 150,
+            "skott_per_meter": 1300,
+            "colors": {
+                "vit/gul rand": 4026,
+                "oblekt/vit rand": 4025,
+                "vit/stålgrå rand": 3889,
+                "vit/plommon rand": 3888,
+                "vit/oblekt rand": 3887,
+                "vit/mörkblå rand": 3886,
+                "vit/ljusgrön rand": 3885,
+                "vit": 3884,
+                "oblekt": 3883
+            }
+        }
+    },
+    "royal": {
+        "150": {
+            "name": "Royal metervara bredd 150 cm",
+            "width": 150,
+            "skott_per_meter": 1300,
+            "colors": {
+                "svart": 4008,
+                "stålgrå": 3935,
+                "vinröd": 3767,
+                "rosa": 3766,
+                "vit": 2056,
+                "orange": 2055,
+                "ljusgrå": 2053,
+                "koboltblå": 2052,
+                "brun": 1995
+            }
+        }
+    },
+    "mormor": {
+        "130": {
+            "name": "Mormor metervara bredd 130 cm",
+            "width": 130,
+            "skott_per_meter": 1300,
+            "colors": {
+                "gammelrosa": 3992,
+                "rosa": 3991,
+                "vit": 3763,
+                "röd": 3762,
+                "ljusgrön": 3761,
+                "ljusblå": 3760,
+                "linne": 3759,
+                "gul": 1722
+            }
+        },
+        "150": {
+            "name": "Mormor metervara bredd 150 cm",
+            "width": 150,
+            "skott_per_meter": 1300,
+            "colors": {
+                "svart": 3994,
+                "gammelrosa": 3993,
+                "röd": 3765,
+                "ljusgrön": 3764,
+                "gul": 2155,
+                "ljusblå": 1735,
+                "vit": 1730,
+                "linne": 1723
+            }
+        }
+    },
+    "lya": {
+        "150": {
+            "name": "Lya metervara bredd 150 cm",
+            "width": 150,
+            "skott_per_meter": 1300,
+            "colors": {
+                "rosa": 3987,
+                "svart": 3758,
+                "stålgrå": 3757,
+                "plommon": 3756,
+                "oblekt": 3755,
+                "ljusblå": 3754,
+                "linne": 252,
+                "vit": 1999
+            }
+        }
+    },
+    "davids harpa": {
+        "130": {
+            "name": "Davids harpa metervara bredd 130 cm",
+            "width": 130,
+            "skott_per_meter": 1300,
+            "colors": {
+                "ljusgrön": 3984,
+                "röd": 3941,
+                "vit": 3753,
+                "stålgrå": 3752,
+                "sand": 3751,
+                "ljusblå": 3750,
+                "linne": 3749,
+                "gammelrosa": 1708
+            }
+        },
+        "150": {
+            "name": "Davids Harpa metervara bredd 150 cm",
+            "width": 150,
+            "skott_per_meter": 1300,
+            "colors": {
+                "röd": 3983,
+                "ljusgrön": 3942,
+                "vit": 3748,
+                "stålgrå": 3747,
+                "sand": 3746,
+                "ljusblå": 3745,
+                "linne": 3744,
+                "gammelrosa": 1709
+            }
+        }
+    },
+    "randen": {
+        "50": {
+            "name": "Randen metervara bredd 50 cm",
+            "width": 50,
+            "skott_per_meter": 1300,
+            "colors": {
+                "mörkblå": 3974
+            }
+        }
+    },
+    "troentorp": {
+        "130": {
+            "name": "Troentorp metervara bredd 130 cm",
+            "width": 130,
+            "skott_per_meter": 1300,
+            "colors": {
+                "oblekt": 3962,
+                "linne": 3961,
+                "tallgrön": 3960,
+                "gul": 3939,
+                "brun": 3937,
+                "sand": 3936,
+                "vit": 3893,
+                "rosa": 3892,
+                "halmgul": 3891,
+                "ljusgrön": 3890
+            }
+        }
+    },
+    "falsterbo": {
+        "50": {
+            "name": "Falsterbo metervara bredd 50 cm",
+            "width": 50,
+            "skott_per_meter": 1300,
+            "colors": {
+                "oblekt": 3920,
+                "natur": 3919
+            }
+        }
+    },
+    "köksrutan": {
+        "50": {
+            "name": "Köksrutan metervara bredd 50 cm",
+            "width": 50,
+            "skott_per_meter": 1300,
+            "colors": {
+                "stålgrå/vit": 3897,
+                "röd/vit": 3896,
+                "ljusblå/vit": 3894
+            }
+        }
+    },
+    "svinnsmart": {
+        "130": {
+            "name": "Svinnsmart metervara bredd 130 cm",
+            "width": 130,
+            "skott_per_meter": 1300,
+            "colors": {
+                "stuv": 3865
+            }
+        },
+        "150": {
+            "name": "Svinnsmart metervara bredd 150 cm",
+            "width": 150,
+            "skott_per_meter": 1300,
+            "colors": {
+                "stuv": 3869
+            }
+        }
+    },
+    "lervik": {
+        "37": {
+            "name": "Lervik metervara bredd 37 cm",
+            "width": 37,
+            "skott_per_meter": 1300,
+            "colors": {
+                "stålgrå/svart/vit": 3771,
+                "natur/röd/vit": 3770,
+                "koboltblå/natur/vit": 3769,
+                "gul/ljusgrön/vit": 1958
+            }
+        }
+    },
+    "torekov": {
+        "37": {
+            "name": "Torekov metervara bredd 37 cm",
+            "width": 37,
+            "skott_per_meter": 1300,
+            "colors": {
+                "stålgrå/svart/vit": 3768,
+                "natur/röd/vit": 2391,
+                "natur/röd/oblekt": 1805,
+                "koboltblå/natur/vit": 1804,
+                "gul/ljusgrön/vit": 1798
+            }
+        }
+    },
+    "båstad": {
+        "130": {
+            "name": "Båstad metervara bredd 130 cm",
+            "width": 130,
+            "skott_per_meter": 1300,
+            "colors": {
+                "röd/vit": 3665,
+                "röd/natur": 3664,
+                "röd/linne": 3663,
+                "vit/röd": 1789,
+                "linne/röd": 1788,
+                "natur/röd": 1787
+            }
+        },
+        "150": {
+            "name": "Båstad metervara bredd 150 cm",
+            "width": 150,
+            "skott_per_meter": 1300,
+            "colors": {
+                "röd/vit": 3668,
+                "röd/natur": 3667,
+                "röd/linne": 3666,
+                "vit/röd": 1792,
+                "linne/röd": 1791,
+                "natur/röd": 1790
+            }
+        }
+    },
+    "linnea": {
+        "130": {
+            "name": "Linnea metervara bredd 130 cm",
+            "width": 130,
+            "skott_per_meter": 1300,
+            "colors": {
+                "grå rutig": 3662,
+                "grå randig": 3661,
+                "blå rutig": 3660,
+                "blå randig": 3659
+            }
+        }
+    },
+    "skåne": {
+        "130": {
+            "name": "Skåne metervara bredd 130 cm",
+            "width": 130,
+            "skott_per_meter": 1300,
+            "colors": {
+                "natur": 3622,
+                "ljusgrön": 3621,
+                "ljusblå": 3620,
+                "linne": 3619
+            }
+        }
+    }
+}

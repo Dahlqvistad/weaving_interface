@@ -32,7 +32,7 @@ app.post('/api/machine-data', async (req: Request, res: Response) => {
         if (machine) {
             await MachineModel.update(machine_id, {
                 status: event_type === 'production' ? 1 : 0,
-                meter_idag: machine.meter_idag + (value || 0),
+                skott_idag: machine.skott_idag + (value || 0),
                 last_active: new Date().toISOString()
             });
         }
@@ -63,7 +63,7 @@ app.post('/api/register-device', async (req: Request, res: Response) => {
             name: deviceName,
             ip: req.ip || req.connection.remoteAddress || 'unknown',
             status: 0, // Initially inactive
-            meter_idag: 0,
+            skott_idag: 0,
             driftstatus: 0
         });
         

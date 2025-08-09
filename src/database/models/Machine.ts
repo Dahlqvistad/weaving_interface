@@ -7,8 +7,8 @@ export interface MachineData {
     ip: string;
     status: number;
     fabric_id?: number; // ADD THIS
-    meter_idag?: number;
-    meter_fabric?: number; // ADD THIS
+    skott_idag?: number;
+    skott_fabric?: number; // ADD THIS
     uptime?: number; // ADD THIS
     downtime?: number; // ADD THIS
 }
@@ -34,7 +34,7 @@ export const MachineModel = {
     create: (data: Omit<MachineData, 'id'>): Promise<number> => {
         return new Promise((resolve, reject) => {
             const stmt = db.prepare(`
-                INSERT INTO machines (name, ip, status, fabric_id, meter_idag, meter_fabric, uptime, downtime) 
+                INSERT INTO machines (name, ip, status, fabric_id, skott_idag, skott_fabric, uptime, downtime) 
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             `);
             stmt.run(
@@ -43,8 +43,8 @@ export const MachineModel = {
                     data.ip,
                     data.status || 0,
                     data.fabric_id,
-                    data.meter_idag || 0,
-                    data.meter_fabric || 0,
+                    data.skott_idag || 0,
+                    data.skott_fabric || 0,
                     data.uptime || 0,
                     data.downtime || 0,
                 ],
@@ -65,8 +65,8 @@ export const MachineModel = {
                 ip = COALESCE(?, ip),
                 status = COALESCE(?, status),
                 fabric_id = COALESCE(?, fabric_id),
-                meter_idag = COALESCE(?, meter_idag),
-                meter_fabric = COALESCE(?, meter_fabric),
+                skott_idag = COALESCE(?, skott_idag),
+                skott_fabric = COALESCE(?, skott_fabric),
                 uptime = COALESCE(?, uptime),
                 downtime = COALESCE(?, downtime),
                 last_active = COALESCE(?, last_active)
@@ -78,8 +78,8 @@ export const MachineModel = {
                     data.ip,
                     data.status,
                     data.fabric_id,
-                    data.meter_idag,
-                    data.meter_fabric,
+                    data.skott_idag,
+                    data.skott_fabric,
                     data.uptime,
                     data.downtime,
                     data.last_active,

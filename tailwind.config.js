@@ -7,6 +7,12 @@ module.exports = {
                 sans: ['Menlo', 'ui-sans-serif', 'system-ui'],
             },
             colors: {
+                status: {
+                    0: '#ba3232', // Inactive
+                    1: '#6ea84c', // Active
+                    2: '#b0b0b0', // Offline
+                    3: '#de8240', // Warning
+                },
                 'vs-gray': {
                     100: '#111215',
                     200: '#22252a', // 34, 37, 42

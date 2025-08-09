@@ -56,9 +56,9 @@ export default function InfoCard({ machineId, className = '' }: InfoCardProps) {
         return () => ws.close();
     }, [machineId]);
 
-    // Animation effect - only runs when machine is active (status 1)
+    // Animation effect - only runs when machine is active
     useEffect(() => {
-        if (!machine || machine.status !== 1) return;
+        if (!machine || !machine.status) return;
 
         const animationInterval = setInterval(() => {
             setCurrentFrame((prev) => (prev === 0 ? 1 : 0));
@@ -67,48 +67,12 @@ export default function InfoCard({ machineId, className = '' }: InfoCardProps) {
         return () => clearInterval(animationInterval);
     }, [machine?.status]);
 
-    // Reset to frame 0 when machine is not actively producing
+    // Reset to frame 0 when machine is inactive
     useEffect(() => {
-        if (machine && machine.status !== 1) {
+        if (machine && !machine.status) {
             setCurrentFrame(0);
         }
     }, [machine?.status]);
-
-    // Helper function to get status colors and text
-    const getStatusInfo = (status: number) => {
-        switch (status) {
-            case 0:
-                return {
-                    bgColor: 'bg-status-0',
-                    text: '🔴 Inaktiv',
-                    color: 'red',
-                };
-            case 1:
-                return {
-                    bgColor: 'bg-status-1',
-                    text: '🟢 Aktiv',
-                    color: 'green',
-                };
-            case 2:
-                return {
-                    bgColor: 'bg-status-2',
-                    text: '⚫ Offline',
-                    color: 'gray',
-                };
-            case 3:
-                return {
-                    bgColor: 'bg-status-3',
-                    text: '🟠 Klar',
-                    color: 'orange',
-                };
-            default:
-                return {
-                    bgColor: 'bg-gray-100',
-                    text: '❓ Okänd',
-                    color: 'gray',
-                };
-        }
-    };
 
     if (loading) {
         return (
@@ -133,17 +97,20 @@ export default function InfoCard({ machineId, className = '' }: InfoCardProps) {
     }
 
     // Choose which image to show based on machine status and animation frame
-    const currentImage =
-        machine.status === 1 ? (currentFrame === 0 ? mill_1 : mill_2) : mill_1;
-
-    const statusInfo = getStatusInfo(machine.status);
+    const currentImage = machine.status
+        ? currentFrame === 0
+            ? mill_1
+            : mill_2
+        : mill_1;
 
     return (
         <div
             className={`bg-theme-background-three border border-theme-background-five rounded-lg p-4 ${className}`}
         >
             <div
-                className={`flex flex-col items-center mb-4 ${statusInfo.bgColor}`}
+                className={`flex flex-col items-center mb-4 ${
+                    machine.status ? 'bg-green-100' : 'bg-red-100'
+                }`}
             >
                 <img
                     src={currentImage}
@@ -156,10 +123,10 @@ export default function InfoCard({ machineId, className = '' }: InfoCardProps) {
             </div>
 
             <p className="text-theme-font-one text-2xl font-bold">
-                {machine.skott_idag}st
+                {machine.skott_idag}m
             </p>
             <p className="text-theme-font-three text-xs mt-1">
-                Status: {statusInfo.text} | Drift:{' '}
+                Status: {machine.status ? '🟢 Aktiv' : '🔴 Stoppad'} | Drift:{' '}
                 {Math.round(
                     (machine.uptime / (machine.uptime + machine.downtime)) * 100
                 ) || 0}

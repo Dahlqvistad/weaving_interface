@@ -37,7 +37,7 @@ app.post('/api/machine-data', async (req: Request, res: Response) => {
         const { machine_id, timestamp, event_type, value, meta } = req.body;
         const analysis = analyzeMachineData(req.body);
 
-        console.log(`Received data from ESP32-${machine_id}:`, req.body);
+        // console.log(`Received data from ESP32-${machine_id}:`, req.body);
 
         // Store raw data
         await MachineRawModel.create({
@@ -56,7 +56,7 @@ app.post('/api/machine-data', async (req: Request, res: Response) => {
 
         if (lastActiveDate !== currentDate) {
             MachineModel.update(machine_id, {
-                meter_idag: 0, // Reset daily meter count
+                skott_idag: 0, // Reset daily meter count
                 uptime: 0,
                 downtime: 0,
             });
@@ -92,10 +92,10 @@ app.post('/api/machine-data', async (req: Request, res: Response) => {
                     fiveMinutesAgo,
                     now
                 );
-                console.log(
-                    `Checking last 5 minutes for machine ${machine_id}:`,
-                    recentRecords[recentRecords.length - 1]
-                );
+                // console.log(
+                //     `Checking last 5 minutes for machine ${machine_id}:`,
+                //     recentRecords[recentRecords.length - 1]
+                // );
 
                 // Check if ALL recent records are zeros (offline) or if any are non-zero (active/inactive)
                 const allZeros =
@@ -116,8 +116,8 @@ app.post('/api/machine-data', async (req: Request, res: Response) => {
 
             await MachineModel.update(machine_id, {
                 status: newStatus,
-                meter_idag: machine.meter_idag + increment,
-                meter_fabric: machine.meter_fabric + increment,
+                skott_idag: machine.skott_idag + increment,
+                skott_fabric: machine.skott_fabric + increment,
                 last_active: timestamp,
                 uptime: newUptime,
                 downtime: newDowntime,
@@ -184,8 +184,8 @@ app.post('/api/register-device', async (req: Request, res: Response) => {
             name: deviceName,
             ip: clientIp,
             status: 0, // Initially inactive
-            meter_idag: 0,
-            meter_fabric: 0,
+            skott_idag: 0,
+            skott_fabric: 0,
             uptime: 0,
             downtime: 0,
             fabric_id: null as number | null,

@@ -21,28 +21,28 @@ export const seedMachines = async () => {
                 name: 'Maskin 1',
                 ip: '192.168.1.101',
                 status: 1, // 1 = active, 0 = inactive
-                meter_idag: 0,
+                skott_idag: 0,
                 driftstatus: 100,
             },
             {
                 name: 'Maskin 2',
                 ip: '192.168.1.102',
                 status: 1,
-                meter_idag: 0,
+                skott_idag: 0,
                 driftstatus: 100,
             },
             {
                 name: 'Maskin 3',
                 ip: '192.168.1.103',
                 status: 0,
-                meter_idag: 0,
+                skott_idag: 0,
                 driftstatus: 0,
             },
             {
                 name: 'Maskin 4',
                 ip: '192.168.1.104',
                 status: 0,
-                meter_idag: 0,
+                skott_idag: 0,
                 driftstatus: 0,
             },
         ];
@@ -164,25 +164,20 @@ export const seedFabrics = async () => {
 
         const testFabrics = [
             {
-                name: 'Cotton Plain',
-                pattern: 'Plain weave',
-                color: 'White',
-                width: 150.0,
-                skott_per_meter: 24.5,
-            },
-            {
-                name: 'Linen Herringbone',
-                pattern: 'Herringbone',
-                color: 'Natural',
-                width: 140.0,
-                skott_per_meter: 28.0,
-            },
-            {
-                name: 'Wool Twill',
-                pattern: 'Twill 2/2',
-                color: 'Gray',
-                width: 160.0,
-                skott_per_meter: 22.0,
+                name: 'Skåne metervara bredd 150',
+                pattern: 'skåne',
+                width: 150,
+                skott_per_meter: 1300,
+                colors: {
+                    vit: 3634, // VIT - white
+                    stålgrå: 3633, // SGR - steel gray
+                    sand: 3632, // SND - sand
+                    plommon: 3631, // PLO - plum
+                    natur: 3630, // NAT - natural
+                    ljusgrön: 3629, // LGÖ - light green
+                    ljusblå: 3628, // LBL - light blue
+                    linne: 3627, // LNE - linen
+                },
             },
         ];
 

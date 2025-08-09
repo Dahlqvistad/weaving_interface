@@ -362,3 +362,114 @@ function broadcastMachineUpdate(machineData: any) {
         }
     });
 }
+// Update machine name endpoint
+app.put('/api/machines/:device_id/name', async (req: Request, res: Response) => {
+    try {
+        const deviceId = parseInt(req.params.device_id);
+        const { name } = req.body;
+        
+        if (!name) {
+            return res.status(400).json({ error: 'Name is required' });
+        }
+        
+        await MachineModel.update(deviceId, { name });
+        const updatedMachine = await MachineModel.getById(deviceId);
+        
+        // Broadcast update to frontend via WebSocket
+        broadcastMachineUpdate(updatedMachine);
+        
+        res.json({ success: true, machine: updatedMachine });
+    } catch (error: any) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Change fabric endpoint
+app.put('/api/machines/:device_id/fabric', async (req: Request, res: Response) => {
+    try {
+        const deviceId = parseInt(req.params.device_id);
+        const { article_number } = req.body;
+        
+        if (!article_number) {
+            return res.status(400).json({ error: 'Article number is required' });
+        }
+        
+        // Reset fabric-specific counter when changing fabric
+        await MachineModel.update(deviceId, { 
+            fabric_id: article_number,
+            skott_fabric: 0  // Reset fabric counter
+        });
+        
+        const updatedMachine = await MachineModel.getById(deviceId);
+        
+        // Log fabric change
+        await MachineRawModel.create({
+            machine_id: deviceId,
+            timestamp: new Date().toISOString(),
+            event_type: 'fabric_change',
+            value: article_number,
+            meta: `Fabric changed to article ${article_number}`,
+        });
+        
+        // Broadcast update to frontend via WebSocket
+        broadcastMachineUpdate(updatedMachine);
+        
+        res.json({ success: true, machine: updatedMachine });
+    } catch (error: any) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+export const startHttpServer = () => {
+    console.log('=== STARTING HTTP SERVER ===');
+    console.log('Host:', host);
+    console.log('Port:', port);
+    console.log('Full URL:', `http://${host}:${port}`);
+
+    app.listen(port, host, () => {
+        console.log(`✅ HTTP API server running on http://${host}:${port}`);
+        console.log('Available endpoints:');
+        console.log('  POST /api/register-device  - ESP32 device registration');
+        console.log('  POST /api/machine-data     - ESP32 data submission');
+        console.log('  GET  /api/health           - Health check');
+        console.log('  GET  /api/devices          - List registered devices');
+        console.log('  GET  /api/machines         - Get machine status');
+        console.log(
+            '  GET  /api/check-update/:device_id - Check for firmware updates'
+        );
+        console.log('🔄 Ready to receive data from ESP32 devices...');
+        console.log('=== SERVER STARTUP COMPLETE ===');
+    });
+
+    app.on('error', (error) => {
+        console.error('❌ Server error:', error);
+    });
+};
+
+// WebSocket server for real-time updates
+const wss = new WebSocketServer({ port: 8081 });
+const clients = new Set();
+
+wss.on('connection', (ws) => {
+    clients.add(ws);
+    console.log('Frontend connected to WebSocket');
+
+    ws.on('close', () => {
+        clients.delete(ws);
+        console.log('Frontend disconnected from WebSocket');
+    });
+});
+
+// Broadcast function
+function broadcastMachineUpdate(machineData: any) {
+    const message = JSON.stringify({
+        type: 'machine_update',
+        data: machineData,
+    });
+
+    clients.forEach((client: any) => {
+        if (client.readyState === 1) {
+            client.send(message);
+        }
+    });
+}

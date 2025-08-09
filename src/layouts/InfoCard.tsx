@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import mill_1 from '../images/loom-animate-1.svg';
 import mill_2 from '../images/loom-animate-2.svg';
+import pencil from '../images/pencil.svg';
 
 interface InfoCardProps {
     machineId: number;
     className?: string;
+    dragHandleProps?: any;
 }
-
 interface MachineData {
     id: number;
     name: string;
@@ -19,10 +20,33 @@ interface MachineData {
     ip: string;
 }
 
-export default function InfoCard({ machineId, className = '' }: InfoCardProps) {
+export default function InfoCard({
+    machineId,
+    className = '',
+    dragHandleProps,
+}: InfoCardProps) {
     const [machine, setMachine] = useState<MachineData | null>(null);
     const [loading, setLoading] = useState(true);
     const [currentFrame, setCurrentFrame] = useState(0);
+    const [isEditing, setIsEditing] = useState(false);
+    const [editName, setEditName] = useState('');
+    const [isUpdating, setIsUpdating] = useState(false);
+
+    // Debug: log dragHandleProps after all hooks, before any conditional returns
+    // React.useEffect(() => {
+    //     if (dragHandleProps == null) {
+    //         console.warn(
+    //             'InfoCard: dragHandleProps is null/undefined for machineId',
+    //             machineId
+    //         );
+    //     } else {
+    //         console.log(
+    //             'InfoCard: dragHandleProps for machineId',
+    //             machineId,
+    //             dragHandleProps
+    //         );
+    //     }
+    // }, [dragHandleProps, machineId]);
 
     useEffect(() => {
         const loadMachine = async () => {
@@ -110,14 +134,85 @@ export default function InfoCard({ machineId, className = '' }: InfoCardProps) {
         }
     };
 
+    // Handle edit name functionality
+    const handleEditClick = () => {
+        if (machine && !isUpdating) {
+            setEditName(machine.name);
+            setIsEditing(true);
+        }
+    };
+
+    const handleNameSubmit = async () => {
+        if (!machine || !editName.trim() || isUpdating) return;
+
+        setIsUpdating(true);
+        try {
+            const response = await fetch(
+                `http://192.168.88.118:8080/api/machines/${machine.id}/name`,
+                {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ name: editName.trim() }),
+                }
+            );
+
+            if (response.ok) {
+                // Update local state immediately for better UX
+                setMachine((prev) =>
+                    prev ? { ...prev, name: editName.trim() } : null
+                );
+                setIsEditing(false);
+            } else {
+                const error = await response.json();
+                console.error('Failed to update machine name:', error);
+                alert('Failed to update machine name. Please try again.');
+            }
+        } catch (error) {
+            console.error('Error updating machine name:', error);
+            alert('Failed to update machine name. Please try again.');
+        } finally {
+            setIsUpdating(false);
+        }
+    };
+
+    const handleKeyPress = (e: React.KeyboardEvent) => {
+        if (e.key === 'Enter') {
+            handleNameSubmit();
+        } else if (e.key === 'Escape') {
+            setIsEditing(false);
+            setEditName('');
+        }
+    };
+
+    const handleBlur = () => {
+        if (!isUpdating) {
+            setIsEditing(false);
+            setEditName('');
+        }
+    };
+
     if (loading) {
         return (
             <div
-                className={`bg-theme-background-three border border-theme-background-five rounded-lg p-4 animate-pulse ${className}`}
+                className={`relative bg-theme-background-three border border-theme-background-five rounded-lg animate-pulse ${className}`}
             >
-                <div className="h-4 bg-theme-background-five rounded mb-2"></div>
-                <div className="h-8 bg-theme-background-five rounded mb-1"></div>
-                <div className="h-3 bg-theme-background-five rounded w-3/4"></div>
+                {/* Drag handle flush at the top edge, outside padding */}
+                <div className="absolute left-0 top-0 w-full h-[24px] flex justify-center z-10">
+                    <div
+                        className="cursor-grab flex items-center justify-center rounded-t-md shadow-sm w-full h-[24px] select-none"
+                        {...(dragHandleProps ? dragHandleProps : {})}
+                        tabIndex={0}
+                        role="button"
+                        aria-label="Drag handle"
+                    ></div>
+                </div>
+                {/* <div className="p-4 pt-6">
+                    <div className="h-4 bg-theme-background-five rounded mb-2"></div>
+                    <div className="h-8 bg-theme-background-five rounded mb-1"></div>
+                    <div className="h-3 bg-theme-background-five rounded w-3/4"></div>
+                </div> */}
             </div>
         );
     }
@@ -125,9 +220,21 @@ export default function InfoCard({ machineId, className = '' }: InfoCardProps) {
     if (!machine) {
         return (
             <div
-                className={`bg-theme-background-three border border-theme-background-five rounded-lg p-4 ${className}`}
+                className={`relative bg-theme-background-three border border-theme-background-five rounded-lg ${className}`}
             >
-                <p className="text-theme-font-three">Machine not found</p>
+                {/* Drag handle flush at the top edge, outside padding */}
+                <div className="absolute left-0 top-0 w-full h-[24px] flex justify-center z-10">
+                    <div
+                        className="cursor-grab flex items-center justify-center bg-vs-gray-500 rounded-t-md shadow-sm w-full h-[24px] select-none"
+                        {...(dragHandleProps ? dragHandleProps : {})}
+                        tabIndex={0}
+                        role="button"
+                        aria-label="Drag handle"
+                    ></div>
+                </div>
+                <div className="p-4 pt-6">
+                    <p className="text-theme-font-three">Machine not found</p>
+                </div>
             </div>
         );
     }
@@ -140,31 +247,76 @@ export default function InfoCard({ machineId, className = '' }: InfoCardProps) {
 
     return (
         <div
-            className={`bg-theme-background-three border border-theme-background-five rounded-lg p-4 ${className}`}
+            className={`relative bg-theme-background-three border border-theme-background-five rounded-lg ${className}`}
         >
-            <div
-                className={`flex flex-col items-center mb-4 ${statusInfo.bgColor}`}
-            >
-                <img
-                    src={currentImage}
-                    alt={machine.name}
-                    className="w-[350px] h-[190px] mb-2 transition-opacity duration-200"
-                />
-                <h3 className="text-theme-font-two text-sm font-medium mb-1">
-                    {machine.name}
-                </h3>
+            {/* Drag handle flush at the top edge, outside padding */}
+            <div className="absolute left-0 top-0 w-full h-[24px] flex justify-center z-10">
+                <div
+                    className="cursor-grab flex items-center justify-center rounded-t-md shadow-sm w-full h-[24px] select-none"
+                    {...(dragHandleProps ? dragHandleProps : {})}
+                    tabIndex={0}
+                    role="button"
+                    aria-label="Drag handle"
+                ></div>
             </div>
+            {/* Main padded content below the handle */}
+            <div className="p-4 pt-6">
+                <div
+                    className={`flex flex-col items-center mb-4 ${statusInfo.bgColor}`}
+                >
+                    <img
+                        src={currentImage}
+                        alt={machine.name}
+                        className="w-[350px] h-[190px] mb-2 transition-opacity duration-200"
+                    />
+                    <div className="py-1 px-2 bg-vs-gray-500 rounded-md mb-1 flex flex-row justify-center items-center gap-3">
+                        {isEditing ? (
+                            <input
+                                type="text"
+                                value={editName}
+                                onChange={(e) => setEditName(e.target.value)}
+                                onKeyDown={handleKeyPress}
+                                onBlur={handleBlur}
+                                className="text-theme-font-three text-sm font-medium bg-transparent border-b border-theme-font-three outline-none min-w-0 text-center"
+                                autoFocus
+                                disabled={isUpdating}
+                                style={{
+                                    width: `${Math.max(
+                                        editName.length * 8,
+                                        80
+                                    )}px`,
+                                }}
+                            />
+                        ) : (
+                            <h3 className="text-theme-font-three text-sm font-medium">
+                                {machine.name}
+                            </h3>
+                        )}
+                        <div
+                            className={`cursor-pointer hover:opacity-80 ${
+                                isUpdating
+                                    ? 'opacity-50 cursor-not-allowed'
+                                    : ''
+                            }`}
+                            onClick={!isUpdating ? handleEditClick : undefined}
+                        >
+                            <img src={pencil} alt="Edit" className="w-4 h-4" />
+                        </div>
+                    </div>
+                </div>
 
-            <p className="text-theme-font-one text-2xl font-bold">
-                {machine.skott_idag}st
-            </p>
-            <p className="text-theme-font-three text-xs mt-1">
-                Status: {statusInfo.text} | Drift:{' '}
-                {Math.round(
-                    (machine.uptime / (machine.uptime + machine.downtime)) * 100
-                ) || 0}
-                %
-            </p>
+                <p className="text-theme-font-one text-2xl font-bold">
+                    {machine.skott_idag}st
+                </p>
+                <p className="text-theme-font-three text-xs mt-1">
+                    Status: {statusInfo.text} | Drift:{' '}
+                    {Math.round(
+                        (machine.uptime / (machine.uptime + machine.downtime)) *
+                            100
+                    ) || 0}
+                    %
+                </p>
+            </div>
         </div>
     );
 }

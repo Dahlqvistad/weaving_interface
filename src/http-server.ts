@@ -309,6 +309,84 @@ app.get('/api/check-update/:device_id', (req, res) => {
     }
 });
 
+// Update machine name endpoint
+app.put('/api/machines/:device_id/name', async (req: Request, res: Response) => {
+    try {
+        const deviceId = parseInt(req.params.device_id);
+        const { name } = req.body;
+        
+        if (!name) {
+            return res.status(400).json({ error: 'Name is required' });
+        }
+        
+        // First get the current machine data
+        const currentMachine = await MachineModel.getById(deviceId);
+        if (!currentMachine) {
+            return res.status(404).json({ error: 'Machine not found' });
+        }
+        
+        // Update with the complete machine data, only changing the name
+        const updatedData = {
+            ...currentMachine,
+            name: name
+        };
+        
+        await MachineModel.update(deviceId, updatedData);
+        const updatedMachine = await MachineModel.getById(deviceId);
+        
+        // Broadcast update to frontend via WebSocket
+        broadcastMachineUpdate(updatedMachine);
+        
+        res.json({ success: true, machine: updatedMachine });
+    } catch (error: any) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Change fabric endpoint
+app.put('/api/machines/:device_id/fabric', async (req: Request, res: Response) => {
+    try {
+        const deviceId = parseInt(req.params.device_id);
+        const { article_number } = req.body;
+        
+        if (!article_number) {
+            return res.status(400).json({ error: 'Article number is required' });
+        }
+        
+        // First get the current machine data
+        const currentMachine = await MachineModel.getById(deviceId);
+        if (!currentMachine) {
+            return res.status(404).json({ error: 'Machine not found' });
+        }
+        
+        // Reset fabric-specific counter when changing fabric
+        const updatedData = {
+            ...currentMachine,
+            fabric_id: article_number,
+            skott_fabric: 0  // Reset fabric counter
+        };
+        
+        await MachineModel.update(deviceId, updatedData);        
+        const updatedMachine = await MachineModel.getById(deviceId);
+        
+        // Log fabric change
+        await MachineRawModel.create({
+            machine_id: deviceId,
+            timestamp: new Date().toISOString(),
+            event_type: 'fabric_change',
+            value: article_number,
+            meta: `Fabric changed to article ${article_number}`,
+        });
+        
+        // Broadcast update to frontend via WebSocket
+        broadcastMachineUpdate(updatedMachine);
+        
+        res.json({ success: true, machine: updatedMachine });
+    } catch (error: any) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 export const startHttpServer = () => {
     console.log('=== STARTING HTTP SERVER ===');
     console.log('Host:', host);

@@ -57,349 +57,382 @@ export default function Home() {
     }[gridCols];
     return (
         <div className="p-6 ">
-            <div>
-                <div className="fixed flex justify-center right-2 gap-2 z-50">
-                    <div
-                        onClick={() => {
-                            setGridCols(2);
-                        }}
-                        className="group rounded shadow cursor-pointer"
-                        title="2x2 grid"
-                    >
-                        <svg
-                            className={`w-12 h-12 hover:stroke-vs-gray-800 ${
-                                gridColClass === 'grid-cols-2'
-                                    ? 'stroke-vs-gray-800'
-                                    : ''
-                            }`}
-                            xmlns="http://www.w3.org/2000/svg"
-                            id="Outline"
-                            viewBox="0 0 32 32"
-                            width="512"
-                            height="512"
-                            stroke="#757980"
+            <div className="relative w-full mb-8 h-[100px]">
+                <h1 className="absolute left-1/2 top-0 transform -translate-x-1/2 text-[70px] font-bold text-theme-font-one">
+                    {currentTime.toLocaleTimeString([], {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                    })}
+                </h1>
+                <div className="absolute right-0 top-0 flex flex-col items-end">
+                    <div className="relative flex gap-2 z-50">
+                        <div
+                            onClick={() => {
+                                setGridCols(1);
+                            }}
+                            className="group rounded shadow cursor-pointer"
+                            title="1x1 grid"
                         >
-                            <rect
-                                x="1"
-                                y="1"
-                                width="13"
-                                height="13"
-                                rx="2"
-                                fill="none"
-                                strokeWidth="1.5"
-                            />
-                            <rect
-                                x="18"
-                                y="1"
-                                width="13"
-                                height="13"
-                                rx="2"
-                                fill="none"
-                                strokeWidth="1.5"
-                            />
-
-                            <rect
-                                x="1"
-                                y="18"
-                                width="13"
-                                height="13"
-                                rx="2"
-                                fill="none"
-                                strokeWidth="1.5"
-                            />
-                            <rect
-                                x="18"
-                                y="18"
-                                width="13"
-                                height="13"
-                                rx="2"
-                                fill="none"
-                                strokeWidth="1.5"
-                            />
-                        </svg>
-                    </div>
-                    <div
-                        onClick={() => {
-                            setGridCols(3);
-                        }}
-                        className="group rounded shadow cursor-pointer"
-                        title="4x4 grid"
-                    >
-                        <svg
-                            className={`w-12 h-12 hover:stroke-vs-gray-800 ${
-                                gridColClass === 'grid-cols-3'
-                                    ? 'stroke-vs-gray-800'
-                                    : ''
-                            }`}
-                            xmlns="http://www.w3.org/2000/svg"
-                            id="Outline"
-                            viewBox="0 0 32 32"
-                            width="512"
-                            height="512"
-                            stroke="#757980"
+                            <svg
+                                className={`w-12 h-12 hover:stroke-vs-gray-800 ${
+                                    gridColClass === 'grid-cols-1'
+                                        ? 'stroke-vs-gray-800'
+                                        : ''
+                                }`}
+                                xmlns="http://www.w3.org/2000/svg"
+                                id="Outline"
+                                viewBox="0 0 32 32"
+                                width="512"
+                                height="512"
+                                stroke="#757980"
+                            >
+                                <rect
+                                    x="1"
+                                    y="1"
+                                    width="30"
+                                    height="30"
+                                    rx="2"
+                                    fill="none"
+                                    stroke-width="1.5"
+                                />
+                            </svg>
+                        </div>
+                        <div
+                            onClick={() => {
+                                setGridCols(2);
+                            }}
+                            className="group rounded shadow cursor-pointer"
+                            title="2x2 grid"
                         >
-                            <rect
-                                x="1"
-                                y="1"
-                                width="7.1670"
-                                height="7.1670"
-                                rx="1.5"
-                                fill="none"
-                                strokeWidth="1.5"
-                            />
-                            <rect
-                                x="12.167"
-                                y="1"
-                                width="7.1670"
-                                height="7.1670"
-                                rx="1.5"
-                                fill="none"
-                                strokeWidth="1.5"
-                            />
-                            <rect
-                                x="23.334"
-                                y="1"
-                                width="7.1670"
-                                height="7.1670"
-                                rx="1.5"
-                                fill="none"
-                                strokeWidth="1.5"
-                            />
+                            <svg
+                                className={`w-12 h-12 hover:stroke-vs-gray-800 ${
+                                    gridColClass === 'grid-cols-2'
+                                        ? 'stroke-vs-gray-800'
+                                        : ''
+                                }`}
+                                xmlns="http://www.w3.org/2000/svg"
+                                id="Outline"
+                                viewBox="0 0 32 32"
+                                width="512"
+                                height="512"
+                                stroke="#757980"
+                            >
+                                <rect
+                                    x="1"
+                                    y="1"
+                                    width="13"
+                                    height="13"
+                                    rx="2"
+                                    fill="none"
+                                    strokeWidth="1.5"
+                                />
+                                <rect
+                                    x="18"
+                                    y="1"
+                                    width="13"
+                                    height="13"
+                                    rx="2"
+                                    fill="none"
+                                    strokeWidth="1.5"
+                                />
 
-                            <rect
-                                x="1"
-                                y="12.167"
-                                width="7.1670"
-                                height="7.1670"
-                                rx="1.5"
-                                fill="none"
-                                strokeWidth="1.5"
-                            />
-                            <rect
-                                x="12.167"
-                                y="12.167"
-                                width="7.1670"
-                                height="7.1670"
-                                rx="1.5"
-                                fill="none"
-                                strokeWidth="1.5"
-                            />
-                            <rect
-                                x="23.334"
-                                y="12.167"
-                                width="7.1670"
-                                height="7.1670"
-                                rx="1.5"
-                                fill="none"
-                                strokeWidth="1.5"
-                            />
-
-                            <rect
-                                x="1"
-                                y="23.334"
-                                width="7.1670"
-                                height="7.1670"
-                                rx="1.5"
-                                fill="none"
-                                strokeWidth="1.5"
-                            />
-                            <rect
-                                x="12.167"
-                                y="23.334"
-                                width="7.1670"
-                                height="7.1670"
-                                rx="1.5"
-                                fill="none"
-                                strokeWidth="1.5"
-                            />
-                            <rect
-                                x="23.334"
-                                y="23.334"
-                                width="7.1670"
-                                height="7.1670"
-                                rx="1.5"
-                                fill="none"
-                                strokeWidth="1.5"
-                            />
-                        </svg>
-                    </div>
-                    <div
-                        onClick={() => {
-                            setGridCols(4);
-                        }}
-                        className="group rounded shadow cursor-pointer"
-                        title="4x4 grid"
-                    >
-                        <svg
-                            className={`w-12 h-12 hover:stroke-vs-gray-800 ${
-                                gridColClass === 'grid-cols-4'
-                                    ? 'stroke-vs-gray-800'
-                                    : ''
-                            }`}
-                            xmlns="http://www.w3.org/2000/svg"
-                            id="Outline"
-                            viewBox="0 0 32 32"
-                            width="512"
-                            height="512"
-                            stroke="#757980"
+                                <rect
+                                    x="1"
+                                    y="18"
+                                    width="13"
+                                    height="13"
+                                    rx="2"
+                                    fill="none"
+                                    strokeWidth="1.5"
+                                />
+                                <rect
+                                    x="18"
+                                    y="18"
+                                    width="13"
+                                    height="13"
+                                    rx="2"
+                                    fill="none"
+                                    strokeWidth="1.5"
+                                />
+                            </svg>
+                        </div>
+                        <div
+                            onClick={() => {
+                                setGridCols(3);
+                            }}
+                            className="group rounded shadow cursor-pointer"
+                            title="4x4 grid"
                         >
-                            <rect
-                                x="1"
-                                y="1"
-                                width="5"
-                                height="5"
-                                rx="1.5"
-                                fill="none"
-                                strokeWidth="1.5"
-                            />
-                            <rect
-                                x="9"
-                                y="1"
-                                width="5"
-                                height="5"
-                                rx="1.5"
-                                fill="none"
-                                strokeWidth="1.5"
-                            />
-                            <rect
-                                x="17"
-                                y="1"
-                                width="5"
-                                height="5"
-                                rx="1.5"
-                                fill="none"
-                                strokeWidth="1.5"
-                            />
-                            <rect
-                                x="25"
-                                y="1"
-                                width="5"
-                                height="5"
-                                rx="1.5"
-                                fill="none"
-                                strokeWidth="1.5"
-                            />
+                            <svg
+                                className={`w-12 h-12 hover:stroke-vs-gray-800 ${
+                                    gridColClass === 'grid-cols-3'
+                                        ? 'stroke-vs-gray-800'
+                                        : ''
+                                }`}
+                                xmlns="http://www.w3.org/2000/svg"
+                                id="Outline"
+                                viewBox="0 0 32 32"
+                                width="512"
+                                height="512"
+                                stroke="#757980"
+                            >
+                                <rect
+                                    x="1"
+                                    y="1"
+                                    width="7.1670"
+                                    height="7.1670"
+                                    rx="1.5"
+                                    fill="none"
+                                    strokeWidth="1.5"
+                                />
+                                <rect
+                                    x="12.167"
+                                    y="1"
+                                    width="7.1670"
+                                    height="7.1670"
+                                    rx="1.5"
+                                    fill="none"
+                                    strokeWidth="1.5"
+                                />
+                                <rect
+                                    x="23.334"
+                                    y="1"
+                                    width="7.1670"
+                                    height="7.1670"
+                                    rx="1.5"
+                                    fill="none"
+                                    strokeWidth="1.5"
+                                />
 
-                            <rect
-                                x="1"
-                                y="9"
-                                width="5"
-                                height="5"
-                                rx="1.5"
-                                fill="none"
-                                strokeWidth="1.5"
-                            />
-                            <rect
-                                x="9"
-                                y="9"
-                                width="5"
-                                height="5"
-                                rx="1.5"
-                                fill="none"
-                                strokeWidth="1.5"
-                            />
-                            <rect
-                                x="17"
-                                y="9"
-                                width="5"
-                                height="5"
-                                rx="1.5"
-                                fill="none"
-                                strokeWidth="1.5"
-                            />
-                            <rect
-                                x="25"
-                                y="9"
-                                width="5"
-                                height="5"
-                                rx="1.5"
-                                fill="none"
-                                strokeWidth="1.5"
-                            />
+                                <rect
+                                    x="1"
+                                    y="12.167"
+                                    width="7.1670"
+                                    height="7.1670"
+                                    rx="1.5"
+                                    fill="none"
+                                    strokeWidth="1.5"
+                                />
+                                <rect
+                                    x="12.167"
+                                    y="12.167"
+                                    width="7.1670"
+                                    height="7.1670"
+                                    rx="1.5"
+                                    fill="none"
+                                    strokeWidth="1.5"
+                                />
+                                <rect
+                                    x="23.334"
+                                    y="12.167"
+                                    width="7.1670"
+                                    height="7.1670"
+                                    rx="1.5"
+                                    fill="none"
+                                    strokeWidth="1.5"
+                                />
 
-                            <rect
-                                x="1"
-                                y="17"
-                                width="5"
-                                height="5"
-                                rx="1.5"
-                                fill="none"
-                                strokeWidth="1.5"
-                            />
-                            <rect
-                                x="9"
-                                y="17"
-                                width="5"
-                                height="5"
-                                rx="1.5"
-                                fill="none"
-                                strokeWidth="1.5"
-                            />
-                            <rect
-                                x="17"
-                                y="17"
-                                width="5"
-                                height="5"
-                                rx="1.5"
-                                fill="none"
-                                strokeWidth="1.5"
-                            />
-                            <rect
-                                x="25"
-                                y="17"
-                                width="5"
-                                height="5"
-                                rx="1.5"
-                                fill="none"
-                                strokeWidth="1.5"
-                            />
+                                <rect
+                                    x="1"
+                                    y="23.334"
+                                    width="7.1670"
+                                    height="7.1670"
+                                    rx="1.5"
+                                    fill="none"
+                                    strokeWidth="1.5"
+                                />
+                                <rect
+                                    x="12.167"
+                                    y="23.334"
+                                    width="7.1670"
+                                    height="7.1670"
+                                    rx="1.5"
+                                    fill="none"
+                                    strokeWidth="1.5"
+                                />
+                                <rect
+                                    x="23.334"
+                                    y="23.334"
+                                    width="7.1670"
+                                    height="7.1670"
+                                    rx="1.5"
+                                    fill="none"
+                                    strokeWidth="1.5"
+                                />
+                            </svg>
+                        </div>
+                        <div
+                            onClick={() => {
+                                setGridCols(4);
+                            }}
+                            className="group rounded shadow cursor-pointer"
+                            title="4x4 grid"
+                        >
+                            <svg
+                                className={`w-12 h-12 hover:stroke-vs-gray-800 ${
+                                    gridColClass === 'grid-cols-4'
+                                        ? 'stroke-vs-gray-800'
+                                        : ''
+                                }`}
+                                xmlns="http://www.w3.org/2000/svg"
+                                id="Outline"
+                                viewBox="0 0 32 32"
+                                width="512"
+                                height="512"
+                                stroke="#757980"
+                            >
+                                <rect
+                                    x="1"
+                                    y="1"
+                                    width="5"
+                                    height="5"
+                                    rx="1.5"
+                                    fill="none"
+                                    strokeWidth="1.5"
+                                />
+                                <rect
+                                    x="9"
+                                    y="1"
+                                    width="5"
+                                    height="5"
+                                    rx="1.5"
+                                    fill="none"
+                                    strokeWidth="1.5"
+                                />
+                                <rect
+                                    x="17"
+                                    y="1"
+                                    width="5"
+                                    height="5"
+                                    rx="1.5"
+                                    fill="none"
+                                    strokeWidth="1.5"
+                                />
+                                <rect
+                                    x="25"
+                                    y="1"
+                                    width="5"
+                                    height="5"
+                                    rx="1.5"
+                                    fill="none"
+                                    strokeWidth="1.5"
+                                />
 
-                            <rect
-                                x="1"
-                                y="25"
-                                width="5"
-                                height="5"
-                                rx="1.5"
-                                fill="none"
-                                strokeWidth="1.5"
-                            />
-                            <rect
-                                x="9"
-                                y="25"
-                                width="5"
-                                height="5"
-                                rx="1.5"
-                                fill="none"
-                                strokeWidth="1.5"
-                            />
-                            <rect
-                                x="17"
-                                y="25"
-                                width="5"
-                                height="5"
-                                rx="1.5"
-                                fill="none"
-                                strokeWidth="1.5"
-                            />
-                            <rect
-                                x="25"
-                                y="25"
-                                width="5"
-                                height="5"
-                                rx="1.5"
-                                fill="none"
-                                strokeWidth="1.5"
-                            />
-                        </svg>
+                                <rect
+                                    x="1"
+                                    y="9"
+                                    width="5"
+                                    height="5"
+                                    rx="1.5"
+                                    fill="none"
+                                    strokeWidth="1.5"
+                                />
+                                <rect
+                                    x="9"
+                                    y="9"
+                                    width="5"
+                                    height="5"
+                                    rx="1.5"
+                                    fill="none"
+                                    strokeWidth="1.5"
+                                />
+                                <rect
+                                    x="17"
+                                    y="9"
+                                    width="5"
+                                    height="5"
+                                    rx="1.5"
+                                    fill="none"
+                                    strokeWidth="1.5"
+                                />
+                                <rect
+                                    x="25"
+                                    y="9"
+                                    width="5"
+                                    height="5"
+                                    rx="1.5"
+                                    fill="none"
+                                    strokeWidth="1.5"
+                                />
+
+                                <rect
+                                    x="1"
+                                    y="17"
+                                    width="5"
+                                    height="5"
+                                    rx="1.5"
+                                    fill="none"
+                                    strokeWidth="1.5"
+                                />
+                                <rect
+                                    x="9"
+                                    y="17"
+                                    width="5"
+                                    height="5"
+                                    rx="1.5"
+                                    fill="none"
+                                    strokeWidth="1.5"
+                                />
+                                <rect
+                                    x="17"
+                                    y="17"
+                                    width="5"
+                                    height="5"
+                                    rx="1.5"
+                                    fill="none"
+                                    strokeWidth="1.5"
+                                />
+                                <rect
+                                    x="25"
+                                    y="17"
+                                    width="5"
+                                    height="5"
+                                    rx="1.5"
+                                    fill="none"
+                                    strokeWidth="1.5"
+                                />
+
+                                <rect
+                                    x="1"
+                                    y="25"
+                                    width="5"
+                                    height="5"
+                                    rx="1.5"
+                                    fill="none"
+                                    strokeWidth="1.5"
+                                />
+                                <rect
+                                    x="9"
+                                    y="25"
+                                    width="5"
+                                    height="5"
+                                    rx="1.5"
+                                    fill="none"
+                                    strokeWidth="1.5"
+                                />
+                                <rect
+                                    x="17"
+                                    y="25"
+                                    width="5"
+                                    height="5"
+                                    rx="1.5"
+                                    fill="none"
+                                    strokeWidth="1.5"
+                                />
+                                <rect
+                                    x="25"
+                                    y="25"
+                                    width="5"
+                                    height="5"
+                                    rx="1.5"
+                                    fill="none"
+                                    strokeWidth="1.5"
+                                />
+                            </svg>
+                        </div>
                     </div>
                 </div>
             </div>
-            <h1 className="text-[70px] flex justify-center font-bold text-theme-font-one mb-8">
-                {currentTime.toLocaleTimeString([], {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                })}
-            </h1>
 
             {loading ? (
                 <div>Loading machines...</div>

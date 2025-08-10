@@ -140,6 +140,8 @@ const createWindow = () => {
                     nodeIntegration: true,
                 },
                 titleBarStyle: 'default',
+                title: 'Vävdator', // Set the window title
+                icon: path.join(__dirname, 'src/images/app-icon.png'), // Adjust path as needed
             });
 
             if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {

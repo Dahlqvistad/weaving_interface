@@ -414,7 +414,7 @@ export default function InfoCard({
                         : '...'}
                 </p>
                 <p
-                    className="text-theme-font-two text-xs mt-1 p-1 pl-2 rounded-md hover:bg-vs-gray-600 hover:cursor-pointer"
+                    className="text-theme-font-two text-2xl mt-1 p-1 pl-2 rounded-md hover:bg-vs-gray-600 hover:cursor-pointer"
                     onClick={() => setShowFabricModal(true)}
                 >
                     {machine.fabric_id ? (

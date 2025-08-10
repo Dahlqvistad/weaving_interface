@@ -1,6 +1,6 @@
 {
-  "name": "electron-app",
-  "productName": "electron-app",
+  "name": "weaving-interface",
+  "productName": "Vävdator",
   "version": "1.0.0",
   "description": "My Electron application description",
   "main": ".vite/build/main.js",

@@ -70,7 +70,7 @@ app.post('/api/machine-data', async (req: Request, res: Response) => {
             const increment = value !== undefined ? value : 0;
 
             // Get skott_per_meter for the current fabric
-            let skottPerMeter = 1;
+            let skottPerMeter = Infinity;
             if (machine.fabric_id) {
                 // Get fabric details from FabricModel
                 const { FabricModel } = await import(
@@ -92,8 +92,16 @@ app.post('/api/machine-data', async (req: Request, res: Response) => {
             let newDowntime;
             let newUptime;
 
-            if (increment > 0) {
+            if (
+                skottPerMeter !== Infinity &&
+                machine.skott_fabric + increment >= skottPerMeter * 25
+            ) {
+                newStatus = 3; // Done
+            } else if (increment > 0) {
+                // If skott_fabric + increment >= skott_per_meter * 25, set status = 3 (done)
+
                 newStatus = 1; // Active/producing
+
                 newDowntime = machine.downtime;
                 newUptime = machine.uptime + 1;
             } else {

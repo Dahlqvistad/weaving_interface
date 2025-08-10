@@ -12,6 +12,7 @@ export const initDatabase = (): Promise<void> => {
         status INTEGER NOT NULL DEFAULT 0, -- 0 = inactive, 1 = active
         fabric_id INTEGER,
         skott_idag INTEGER NOT NULL DEFAULT 0,
+        meter_idag INTEGER NOT NULL DEFAULT 0,
         skott_fabric INTEGER NOT NULL DEFAULT 0,
         uptime INTEGER NOT NULL DEFAULT 0,
         downtime INTEGER NOT NULL DEFAULT 0

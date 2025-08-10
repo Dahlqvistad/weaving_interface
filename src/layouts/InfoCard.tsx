@@ -15,6 +15,7 @@ interface MachineData {
     name: string;
     status: number;
     skott_idag: number;
+    meter_idag: number;
     uptime: number;
     downtime: number;
     fabric_id?: number;
@@ -68,24 +69,63 @@ export default function InfoCard({
     const [machine, setMachine] = useState<MachineData | null>(null);
     const [loading, setLoading] = useState(true);
     const [currentFrame, setCurrentFrame] = useState(0);
+
+    // Animation effect for mill images
+    useEffect(() => {
+        let interval: NodeJS.Timeout | null = null;
+        if (machine && machine.status === 1) {
+            interval = setInterval(() => {
+                setCurrentFrame((prev) => (prev === 0 ? 1 : 0));
+            }, 500);
+        } else {
+            setCurrentFrame(0); // Always show mill_1 when not active
+        }
+        return () => {
+            if (interval) clearInterval(interval);
+        };
+    }, [machine?.status]);
     const [isEditing, setIsEditing] = useState(false);
     const [editName, setEditName] = useState('');
     const [isUpdating, setIsUpdating] = useState(false);
 
     useEffect(() => {
+        let ws: WebSocket | null = null;
+        let mounted = true;
         const loadMachine = async () => {
             try {
                 const machineData = await window.dbAPI.machine.getById(
                     machineId
                 );
-                setMachine(machineData);
-                setLoading(false);
+                if (mounted) {
+                    setMachine(machineData);
+                    setLoading(false);
+                }
             } catch (error) {
                 console.error('Error loading machine:', error);
-                setLoading(false);
+                if (mounted) setLoading(false);
             }
         };
         loadMachine();
+
+        // Subscribe to WebSocket updates for this machine
+        ws = new WebSocket('ws://192.168.88.118:8081');
+        ws.onmessage = (event) => {
+            try {
+                const message = JSON.parse(event.data);
+                if (
+                    message.type === 'machine_update' &&
+                    message.data.id === machineId
+                ) {
+                    setMachine(message.data);
+                }
+            } catch (err) {
+                // Ignore parse errors
+            }
+        };
+        return () => {
+            mounted = false;
+            if (ws) ws.close();
+        };
     }, [machineId]);
 
     // State for skott_per_meter
@@ -350,7 +390,8 @@ export default function InfoCard({
                         (machine.uptime / (machine.uptime + machine.downtime)) *
                             100
                     ) || 0}
-                    %
+                    % | Meter vävda idag: {(machine.meter_idag ?? 0).toFixed(2)}{' '}
+                    m
                 </p>
             </div>
         </div>

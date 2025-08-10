@@ -6,11 +6,12 @@ export interface MachineData {
     last_active?: string;
     ip: string;
     status: number;
-    fabric_id?: number; // ADD THIS
+    fabric_id?: number;
     skott_idag?: number;
-    skott_fabric?: number; // ADD THIS
-    uptime?: number; // ADD THIS
-    downtime?: number; // ADD THIS
+    meter_idag?: number;
+    skott_fabric?: number;
+    uptime?: number;
+    downtime?: number;
 }
 export const MachineModel = {
     getAll: (): Promise<MachineData[]> => {
@@ -34,8 +35,8 @@ export const MachineModel = {
     create: (data: Omit<MachineData, 'id'>): Promise<number> => {
         return new Promise((resolve, reject) => {
             const stmt = db.prepare(`
-                INSERT INTO machines (name, ip, status, fabric_id, skott_idag, skott_fabric, uptime, downtime) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO machines (name, ip, status, fabric_id, skott_idag, meter_idag, skott_fabric, uptime, downtime) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             `);
             stmt.run(
                 [
@@ -44,6 +45,7 @@ export const MachineModel = {
                     data.status || 0,
                     data.fabric_id,
                     data.skott_idag || 0,
+                    data.meter_idag || 0,
                     data.skott_fabric || 0,
                     data.uptime || 0,
                     data.downtime || 0,
@@ -66,6 +68,7 @@ export const MachineModel = {
                 status = COALESCE(?, status),
                 fabric_id = COALESCE(?, fabric_id),
                 skott_idag = COALESCE(?, skott_idag),
+                meter_idag = COALESCE(?, meter_idag),
                 skott_fabric = COALESCE(?, skott_fabric),
                 uptime = COALESCE(?, uptime),
                 downtime = COALESCE(?, downtime),
@@ -79,6 +82,7 @@ export const MachineModel = {
                     data.status,
                     data.fabric_id,
                     data.skott_idag,
+                    data.meter_idag,
                     data.skott_fabric,
                     data.uptime,
                     data.downtime,

@@ -69,6 +69,24 @@ app.post('/api/machine-data', async (req: Request, res: Response) => {
         if (machine) {
             const increment = value !== undefined ? value : 0;
 
+            // Get skott_per_meter for the current fabric
+            let skottPerMeter = 1;
+            if (machine.fabric_id) {
+                // Get fabric details from FabricModel
+                const { FabricModel } = await import(
+                    './database/models/Fabric'
+                );
+                const fabric = await FabricModel.getByArticleNumber(
+                    machine.fabric_id
+                );
+                if (fabric && fabric.skott_per_meter) {
+                    skottPerMeter = fabric.skott_per_meter;
+                }
+            }
+            // Calculate meter increment
+            const meterIncrement =
+                skottPerMeter > 0 ? increment / skottPerMeter : 0;
+
             // Determine status based on activity and current downtime
             let newStatus;
             let newDowntime;
@@ -84,7 +102,6 @@ app.post('/api/machine-data', async (req: Request, res: Response) => {
                 newUptime = machine.uptime;
 
                 // Check last 5 minutes (6 minutes to be safe) for consecutive zeros
-                // Check last 5 minutes (6 minutes to be safe) for consecutive zeros
                 const currentTime = new Date(timestamp); // Use ESP32's timestamp as reference
                 const fiveMinutesAgo = new Date(
                     currentTime.getTime() - 6 * 60 * 1000
@@ -96,10 +113,6 @@ app.post('/api/machine-data', async (req: Request, res: Response) => {
                     fiveMinutesAgo,
                     now
                 );
-                // console.log(
-                //     `Checking last 5 minutes for machine ${machine_id}:`,
-                //     recentRecords[recentRecords.length - 1]
-                // );
 
                 // Check if ALL recent records are zeros (offline) or if any are non-zero (active/inactive)
                 const allZeros =
@@ -121,6 +134,7 @@ app.post('/api/machine-data', async (req: Request, res: Response) => {
             await MachineModel.update(machine_id, {
                 status: newStatus,
                 skott_idag: machine.skott_idag + increment,
+                meter_idag: (machine.meter_idag || 0) + meterIncrement,
                 skott_fabric: machine.skott_fabric + increment,
                 last_active: timestamp,
                 uptime: newUptime,

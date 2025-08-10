@@ -3,6 +3,8 @@ import mill_1 from '../images/loom-animate-1.svg';
 import mill_2 from '../images/loom-animate-2.svg';
 import pencil from '../images/pencil.svg';
 
+// Import types and helper
+// Restore local types and helper
 interface InfoCardProps {
     machineId: number;
     className?: string;
@@ -20,6 +22,44 @@ interface MachineData {
     ip: string;
 }
 
+// Helper component to fetch and display fabric name from fabric_id
+function FabricName({
+    fabricId,
+    skottFabric,
+}: {
+    fabricId: number;
+    skottFabric: number;
+}) {
+    const [fabricLabel, setFabricLabel] = useState<string | null>(null);
+    useEffect(() => {
+        let mounted = true;
+        (async () => {
+            try {
+                if (
+                    window.dbAPI &&
+                    window.dbAPI.fabric &&
+                    window.dbAPI.fabric.getName
+                ) {
+                    const label = await window.dbAPI.fabric.getName(fabricId);
+                    if (mounted) {
+                        setFabricLabel(label);
+                    }
+                } else {
+                    setFabricLabel(null);
+                }
+            } catch {
+                setFabricLabel(null);
+            }
+        })();
+        return () => {
+            mounted = false;
+        };
+    }, [fabricId]);
+    return `${fabricLabel ?? fabricId}`;
+}
+
+// ...existing code...
+
 export default function InfoCard({
     machineId,
     className = '',
@@ -31,22 +71,6 @@ export default function InfoCard({
     const [isEditing, setIsEditing] = useState(false);
     const [editName, setEditName] = useState('');
     const [isUpdating, setIsUpdating] = useState(false);
-
-    // Debug: log dragHandleProps after all hooks, before any conditional returns
-    // React.useEffect(() => {
-    //     if (dragHandleProps == null) {
-    //         console.warn(
-    //             'InfoCard: dragHandleProps is null/undefined for machineId',
-    //             machineId
-    //         );
-    //     } else {
-    //         console.log(
-    //             'InfoCard: dragHandleProps for machineId',
-    //             machineId,
-    //             dragHandleProps
-    //         );
-    //     }
-    // }, [dragHandleProps, machineId]);
 
     useEffect(() => {
         const loadMachine = async () => {
@@ -61,42 +85,40 @@ export default function InfoCard({
                 setLoading(false);
             }
         };
-
         loadMachine();
-
-        // WebSocket connection for real-time updates
-        const ws = new WebSocket('ws://192.168.88.118:8081');
-
-        ws.onmessage = (event) => {
-            const message = JSON.parse(event.data);
-            if (
-                message.type === 'machine_update' &&
-                message.data.id === machineId
-            ) {
-                setMachine(message.data);
-            }
-        };
-
-        return () => ws.close();
     }, [machineId]);
 
-    // Animation effect - only runs when machine is active (status 1)
+    // State for skott_per_meter
+    const [skottPerMeter, setSkottPerMeter] = useState<number | null>(null);
+
     useEffect(() => {
-        if (!machine || machine.status !== 1) return;
-
-        const animationInterval = setInterval(() => {
-            setCurrentFrame((prev) => (prev === 0 ? 1 : 0));
-        }, 1000); // Switch every 1000ms for smooth animation
-
-        return () => clearInterval(animationInterval);
-    }, [machine?.status]);
-
-    // Reset to frame 0 when machine is not actively producing
-    useEffect(() => {
-        if (machine && machine.status !== 1) {
-            setCurrentFrame(0);
+        let mounted = true;
+        async function fetchSkottPerMeter() {
+            if (
+                machine?.fabric_id &&
+                window.dbAPI?.fabric?.getByArticleNumber
+            ) {
+                try {
+                    const fabric = await window.dbAPI.fabric.getByArticleNumber(
+                        machine.fabric_id
+                    );
+                    if (mounted && fabric && fabric.skott_per_meter) {
+                        setSkottPerMeter(fabric.skott_per_meter);
+                    } else if (mounted) {
+                        setSkottPerMeter(null);
+                    }
+                } catch (error) {
+                    if (mounted) setSkottPerMeter(null);
+                }
+            } else if (mounted) {
+                setSkottPerMeter(null);
+            }
         }
-    }, [machine?.status]);
+        fetchSkottPerMeter();
+        return () => {
+            mounted = false;
+        };
+    }, [machine?.fabric_id]);
 
     // Helper function to get status colors and text
     const getStatusInfo = (status: number) => {
@@ -306,7 +328,21 @@ export default function InfoCard({
                 </div>
 
                 <p className="text-theme-font-one text-2xl font-bold">
-                    {machine.skott_idag}st
+                    {skottPerMeter
+                        ? `${(machine.skott_fabric / skottPerMeter).toFixed(
+                              2
+                          )} m`
+                        : '...'}
+                </p>
+                <p className="text-theme-font-two text-xs mt-1">
+                    {machine.fabric_id ? (
+                        <FabricName
+                            fabricId={machine.fabric_id}
+                            skottFabric={machine.skott_fabric}
+                        />
+                    ) : (
+                        'Inget tyg valt'
+                    )}
                 </p>
                 <p className="text-theme-font-three text-xs mt-1">
                     Status: {statusInfo.text} | Drift:{' '}

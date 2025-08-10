@@ -14,6 +14,8 @@ declare global {
                 create: (data: any) => Promise<number>;
                 update: (id: number, data: any) => Promise<void>;
                 delete: (id: number) => Promise<void>;
+                getByArticleNumber: (articleNumber: number) => Promise<any>;
+                getName: (articleNumber: number) => Promise<string | null>;
             };
             machineRaw: {
                 getAll: () => Promise<any[]>;

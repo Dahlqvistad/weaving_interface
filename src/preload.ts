@@ -20,6 +20,10 @@ contextBridge.exposeInMainWorld('dbAPI', {
         create: (data: any) => ipcRenderer.invoke('fabric-create', data),
         update: (id: number, data: any) =>
             ipcRenderer.invoke('fabric-update', id, data),
+        getByArticleNumber: (articleNumber: number) =>
+            ipcRenderer.invoke('fabric-getByArticleNumber', articleNumber),
+        getName: (articleNumber: number) =>
+            ipcRenderer.invoke('fabric-getName', articleNumber),
         delete: (id: number) => ipcRenderer.invoke('fabric-delete', id),
     },
     // MachineRaw methods

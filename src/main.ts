@@ -1,9 +1,14 @@
+ipcMain.handle('fabric-getName', async (event, articleNumber) => {
+    const { FabricModel } = await import('./database/models/Fabric');
+    return await FabricModel.getName(articleNumber);
+});
 import { app, BrowserWindow, screen } from 'electron';
 import path from 'path';
 import 'handsontable/dist/handsontable.full.min.css';
 import { initDatabase } from './database/init';
 import { ipcMain } from 'electron';
 import { startHttpServer } from './http-server';
+import { FabricModel } from './database/models/Fabric';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
@@ -18,7 +23,7 @@ initDatabase()
         startHttpServer();
         console.log('🌐 HTTP server should be accessible now!');
     })
-    .catch(error => {
+    .catch((error) => {
         console.error('❌ Database setup error:', error);
     });
 
@@ -77,6 +82,9 @@ ipcMain.handle('fabric-delete', async (event, id) => {
     const { FabricModel } = await import('./database/models/Fabric');
     return await FabricModel.delete(id);
 });
+ipcMain.handle('fabric-getByArticleNumber', async (event, articleNumber) => {
+    return await FabricModel.getByArticleNumber(articleNumber);
+});
 
 // MachineRaw handlers
 ipcMain.handle('machineRaw-getAll', async () => {
@@ -97,44 +105,60 @@ ipcMain.handle('machineRaw-create', async (event, data) => {
 ipcMain.handle(
     'machineRaw-getByDateRange',
     async (event, machineId, startDate, endDate) => {
-        const { MachineRawModel } = await import('./database/models/MachineRaw');
-        return await MachineRawModel.getByDateRange(machineId, startDate, endDate);
+        const { MachineRawModel } = await import(
+            './database/models/MachineRaw'
+        );
+        return await MachineRawModel.getByDateRange(
+            machineId,
+            startDate,
+            endDate
+        );
     }
 );
 
 const createWindow = () => {
     console.log('🪟 Creating browser window...');
-    
+
     // WINDOW CREATION IS NOW SEPARATE AND CANNOT BLOCK HTTP SERVER
-    app.whenReady().then(async () => {
-        const displays = screen.getAllDisplays();
-        const externalDisplay = displays.length > 1 ? displays[1] : displays[0];
+    app.whenReady()
+        .then(async () => {
+            const displays = screen.getAllDisplays();
+            const externalDisplay =
+                displays.length > 1 ? displays[1] : displays[0];
 
-        const mainWindow = new BrowserWindow({
-            width: 1920,
-            height: 1080,
-            x: externalDisplay.bounds.x + (externalDisplay.bounds.width - 1920) / 2,
-            y: externalDisplay.bounds.y + (externalDisplay.bounds.height - 1080) / 2,
-            webPreferences: {
-                preload: path.join(__dirname, 'preload.js'),
-                nodeIntegration: true,
-            },
-            titleBarStyle: 'default',
+            const mainWindow = new BrowserWindow({
+                width: 1920,
+                height: 1080,
+                x:
+                    externalDisplay.bounds.x +
+                    (externalDisplay.bounds.width - 1920) / 2,
+                y:
+                    externalDisplay.bounds.y +
+                    (externalDisplay.bounds.height - 1080) / 2,
+                webPreferences: {
+                    preload: path.join(__dirname, 'preload.js'),
+                    nodeIntegration: true,
+                },
+                titleBarStyle: 'default',
+            });
+
+            if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
+                mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
+            } else {
+                mainWindow.loadFile(
+                    path.join(
+                        __dirname,
+                        `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`
+                    )
+                );
+            }
+
+            mainWindow.webContents.openDevTools();
+            console.log('✅ Browser window created successfully');
+        })
+        .catch((error) => {
+            console.error('❌ Window creation error:', error);
         });
-
-        if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
-            mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
-        } else {
-            mainWindow.loadFile(
-                path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`)
-            );
-        }
-
-        mainWindow.webContents.openDevTools();
-        console.log('✅ Browser window created successfully');
-    }).catch(error => {
-        console.error('❌ Window creation error:', error);
-    });
 };
 
 app.on('ready', createWindow);

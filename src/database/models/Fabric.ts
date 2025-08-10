@@ -10,7 +10,7 @@ export interface FabricData {
     skott_per_meter: number;
 }
 
-const FABRICS_FILE_PATH = path.join(__dirname, '../fabrics.json');
+const FABRICS_FILE_PATH = path.join(process.cwd(), 'data', 'fabrics.json');
 
 // Ensure the data directory exists
 const ensureDataDirectory = async () => {
@@ -41,6 +41,23 @@ const saveFabrics = async (fabrics: FabricData[]): Promise<void> => {
 };
 
 export const FabricModel = {
+    // Get concatenated name and color for an article number
+    getName: async (articleNumber: number): Promise<string | null> => {
+        const data = await fs.readFile(FABRICS_FILE_PATH, 'utf-8');
+        const fabrics = JSON.parse(data);
+        for (const pattern in fabrics) {
+            for (const width in fabrics[pattern]) {
+                const fabric = fabrics[pattern][width];
+                for (const color in fabric.colors) {
+                    const value = fabric.colors[color];
+                    if (Number(value) === Number(articleNumber)) {
+                        return `${fabric.name}, ${color}`;
+                    }
+                }
+            }
+        }
+        return null;
+    },
     getAll: async (): Promise<FabricData[]> => {
         return await loadFabrics();
     },
@@ -68,6 +85,52 @@ export const FabricModel = {
         }
         fabrics[index] = { ...fabrics[index], ...data };
         await saveFabrics(fabrics);
+    },
+    // Find fabric info by article number from nested JSON
+    getByArticleNumber: async (
+        articleNumber: number
+    ): Promise<{
+        name: string;
+        width: number;
+        skott_per_meter: number;
+        color: string;
+        pattern: string;
+        article_number: number;
+    } | null> => {
+        // Read the raw nested JSON
+        const data = await fs.readFile(FABRICS_FILE_PATH, 'utf-8');
+        const fabrics = JSON.parse(data);
+        let checked = 0;
+        let found = false;
+        for (const pattern in fabrics) {
+            for (const width in fabrics[pattern]) {
+                const fabric = fabrics[pattern][width];
+                for (const color in fabric.colors) {
+                    checked++;
+                    const value = fabric.colors[color];
+                    // Debug log for every check
+
+                    if (Number(value) === Number(articleNumber)) {
+                        found = true;
+
+                        return {
+                            name: fabric.name,
+                            width: fabric.width,
+                            skott_per_meter: fabric.skott_per_meter,
+                            color,
+                            pattern,
+                            article_number: articleNumber,
+                        };
+                    }
+                }
+            }
+        }
+        if (!found) {
+            console.warn(
+                `[FabricModel.getByArticleNumber] No match found for articleNumber=${articleNumber}. Checked ${checked} colors.`
+            );
+        }
+        return null;
     },
 
     delete: async (id: number): Promise<void> => {

@@ -269,7 +269,7 @@ export default function InfoCard({
                         alt={machine.name}
                         className="w-[350px] h-[190px] mb-2 transition-opacity duration-200"
                     />
-                    <div className="py-1 px-2 bg-vs-gray-500 rounded-md mb-1 flex flex-row justify-center items-center gap-3">
+                    <div className="py-1 pr-2 pl-4 bg-vs-gray-500 rounded-md mb-1 flex flex-row justify-center items-center gap-3">
                         {isEditing ? (
                             <input
                                 type="text"

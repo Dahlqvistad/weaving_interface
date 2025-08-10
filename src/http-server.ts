@@ -22,20 +22,10 @@ app.use((req: Request, res: Response, next) => {
     next();
 });
 
-function analyzeMachineData(data: any) {
-    // Placeholder for future data analysis logic
-    console.log('Analyzing machine data:', data);
-    const machine_id = data.machine_id;
-
-    if (data.event_type === 'skott') {
-    }
-}
-
 // Endpoint to receive data from ESP32 devices
 app.post('/api/machine-data', async (req: Request, res: Response) => {
     try {
         const { machine_id, timestamp, event_type, value, meta } = req.body;
-        const analysis = analyzeMachineData(req.body);
 
         // console.log(`Received data from ESP32-${machine_id}:`, req.body);
 
@@ -51,15 +41,29 @@ app.post('/api/machine-data', async (req: Request, res: Response) => {
         // Update machine status and daily meter count
         const machine = await MachineModel.getById(machine_id);
 
-        const lastActiveDate = new Date(machine.last_active).toDateString();
-        const currentDate = new Date(timestamp).toDateString();
+        const lastActiveDate = new Date(machine.last_active)
+            .toISOString()
+            .slice(0, 10);
+        const currentDate = new Date(timestamp).toISOString().slice(0, 10);
+
+        const currentMachine = await MachineModel.getById(machine_id);
+        if (!currentMachine) {
+            return res.status(404).json({ error: 'Machine not found' });
+        }
+
+        // Reset fabric-specific counter when changing fabric
+        const updatedData = {
+            ...currentMachine,
+            skott_idag: 0, // Reset daily meter count
+            uptime: 0,
+            downtime: 0,
+        };
 
         if (lastActiveDate !== currentDate) {
-            MachineModel.update(machine_id, {
-                skott_idag: 0, // Reset daily meter count
-                uptime: 0,
-                downtime: 0,
-            });
+            // console.log('Resetting daily meter count for machine', machine_id);
+            await MachineModel.update(machine_id, updatedData);
+            // Re-fetch the machine data after reset
+            Object.assign(machine, await MachineModel.getById(machine_id));
         }
 
         if (machine) {
@@ -310,82 +314,99 @@ app.get('/api/check-update/:device_id', (req, res) => {
 });
 
 // Update machine name endpoint
-app.put('/api/machines/:device_id/name', async (req: Request, res: Response) => {
-    try {
-        const deviceId = parseInt(req.params.device_id);
-        const { name } = req.body;
-        
-        if (!name) {
-            return res.status(400).json({ error: 'Name is required' });
+app.put(
+    '/api/machines/:device_id/name',
+    async (req: Request, res: Response) => {
+        try {
+            const deviceId = parseInt(req.params.device_id);
+            const { name } = req.body;
+
+            if (!name) {
+                return res.status(400).json({ error: 'Name is required' });
+            }
+
+            // Check if name already exists for another machine
+            const allMachines = await MachineModel.getAll();
+            const nameExists = allMachines.some(
+                (m) => m.name === name && m.id !== deviceId
+            );
+            if (nameExists) {
+                return res.status(409).json({ error: 'Name already exists' });
+            }
+
+            // First get the current machine data
+            const currentMachine = await MachineModel.getById(deviceId);
+            if (!currentMachine) {
+                return res.status(404).json({ error: 'Machine not found' });
+            }
+
+            // Update with the complete machine data, only changing the name
+            const updatedData = {
+                ...currentMachine,
+                name: name,
+            };
+
+            await MachineModel.update(deviceId, updatedData);
+            const updatedMachine = await MachineModel.getById(deviceId);
+
+            // Broadcast update to frontend via WebSocket
+            broadcastMachineUpdate(updatedMachine);
+
+            res.json({ success: true, machine: updatedMachine });
+        } catch (error: any) {
+            res.status(500).json({ error: error.message });
         }
-        
-        // First get the current machine data
-        const currentMachine = await MachineModel.getById(deviceId);
-        if (!currentMachine) {
-            return res.status(404).json({ error: 'Machine not found' });
-        }
-        
-        // Update with the complete machine data, only changing the name
-        const updatedData = {
-            ...currentMachine,
-            name: name
-        };
-        
-        await MachineModel.update(deviceId, updatedData);
-        const updatedMachine = await MachineModel.getById(deviceId);
-        
-        // Broadcast update to frontend via WebSocket
-        broadcastMachineUpdate(updatedMachine);
-        
-        res.json({ success: true, machine: updatedMachine });
-    } catch (error: any) {
-        res.status(500).json({ error: error.message });
     }
-});
+);
 
 // Change fabric endpoint
-app.put('/api/machines/:device_id/fabric', async (req: Request, res: Response) => {
-    try {
-        const deviceId = parseInt(req.params.device_id);
-        const { article_number } = req.body;
-        
-        if (!article_number) {
-            return res.status(400).json({ error: 'Article number is required' });
+app.put(
+    '/api/machines/:device_id/fabric',
+    async (req: Request, res: Response) => {
+        try {
+            const deviceId = parseInt(req.params.device_id);
+            const { article_number } = req.body;
+
+            if (!article_number) {
+                return res
+                    .status(400)
+                    .json({ error: 'Article number is required' });
+            }
+
+            // First get the current machine data
+            const currentMachine = await MachineModel.getById(deviceId);
+            if (!currentMachine) {
+                return res.status(404).json({ error: 'Machine not found' });
+            }
+
+            // Reset fabric-specific counter when changing fabric
+            const updatedData = {
+                ...currentMachine,
+                fabric_id: article_number,
+                skott_fabric: 0, // Reset fabric counter
+            };
+
+            await MachineModel.update(deviceId, updatedData);
+            const updatedMachine = await MachineModel.getById(deviceId);
+
+            // Log fabric change
+            await MachineRawModel.create({
+                machine_id: deviceId,
+                timestamp: new Date().toISOString(),
+                event_type: 'fabric_change',
+                value: article_number,
+                meta: `Fabric changed to article ${article_number}`,
+            });
+
+            // Broadcast update to frontend via WebSocket
+            broadcastMachineUpdate(updatedMachine);
+
+            res.json({ success: true, machine: updatedMachine });
+        } catch (error: any) {
+            res.status(500).json({ error: error.message });
         }
-        
-        // First get the current machine data
-        const currentMachine = await MachineModel.getById(deviceId);
-        if (!currentMachine) {
-            return res.status(404).json({ error: 'Machine not found' });
-        }
-        
-        // Reset fabric-specific counter when changing fabric
-        const updatedData = {
-            ...currentMachine,
-            fabric_id: article_number,
-            skott_fabric: 0  // Reset fabric counter
-        };
-        
-        await MachineModel.update(deviceId, updatedData);        
-        const updatedMachine = await MachineModel.getById(deviceId);
-        
-        // Log fabric change
-        await MachineRawModel.create({
-            machine_id: deviceId,
-            timestamp: new Date().toISOString(),
-            event_type: 'fabric_change',
-            value: article_number,
-            meta: `Fabric changed to article ${article_number}`,
-        });
-        
-        // Broadcast update to frontend via WebSocket
-        broadcastMachineUpdate(updatedMachine);
-        
-        res.json({ success: true, machine: updatedMachine });
-    } catch (error: any) {
-        res.status(500).json({ error: error.message });
     }
-});
+);
 
 export const startHttpServer = () => {
     console.log('=== STARTING HTTP SERVER ===');

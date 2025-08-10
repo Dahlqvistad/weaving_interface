@@ -94,19 +94,16 @@ app.post('/api/machine-data', async (req: Request, res: Response) => {
 
             if (increment > 0) {
                 newStatus = 1; // Active/producing
-                newDowntime = machine.downtime; // Keep total downtime for daily stats
+                newDowntime = machine.downtime;
                 newUptime = machine.uptime + 1;
             } else {
                 // Machine is inactive this period
-                newDowntime = machine.downtime + 1;
-                newUptime = machine.uptime;
-
                 // Check last 5 minutes (6 minutes to be safe) for consecutive zeros
-                const currentTime = new Date(timestamp); // Use ESP32's timestamp as reference
+                const currentTime = new Date(timestamp);
                 const fiveMinutesAgo = new Date(
                     currentTime.getTime() - 6 * 60 * 1000
                 ).toISOString();
-                const now = timestamp; // Use ESP32's timestamp directly
+                const now = timestamp;
 
                 const recentRecords = await MachineRawModel.getByDateRange(
                     machine_id,
@@ -114,7 +111,6 @@ app.post('/api/machine-data', async (req: Request, res: Response) => {
                     now
                 );
 
-                // Check if ALL recent records are zeros (offline) or if any are non-zero (active/inactive)
                 const allZeros =
                     recentRecords.length > 0 &&
                     recentRecords.every((record) => record.value === 0);
@@ -123,18 +119,28 @@ app.post('/api/machine-data', async (req: Request, res: Response) => {
                 );
 
                 if (allZeros) {
-                    newStatus = 2; // Offline (all records in last 5 minutes are zero)
+                    newStatus = 2; // Offline
+                    newDowntime = machine.downtime; // Do not increment
+                    newUptime = machine.uptime; // Do not increment
                 } else if (recentRecords[recentRecords.length - 1].value == 0) {
-                    newStatus = 0; // Active (has some production in last 5 minutes)
+                    newStatus = 0; // Active
+                    newDowntime = machine.downtime + 1;
+                    newUptime = machine.uptime;
                 } else {
                     newStatus = 1; // Inactive but not offline
+                    newDowntime = machine.downtime + 1;
+                    newUptime = machine.uptime;
                 }
             }
 
+            // Round meter_idag to 2 decimals
+            const newMeterIdag = Number(
+                ((machine.meter_idag || 0) + meterIncrement).toFixed(2)
+            );
             await MachineModel.update(machine_id, {
                 status: newStatus,
                 skott_idag: machine.skott_idag + increment,
-                meter_idag: (machine.meter_idag || 0) + meterIncrement,
+                meter_idag: newMeterIdag,
                 skott_fabric: machine.skott_fabric + increment,
                 last_active: timestamp,
                 uptime: newUptime,

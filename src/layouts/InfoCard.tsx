@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import FabricSearch from './FabricSearch';
 import mill_1 from '../images/loom-animate-1.svg';
 import mill_2 from '../images/loom-animate-2.svg';
 import pencil from '../images/pencil.svg';
@@ -66,6 +67,8 @@ export default function InfoCard({
     className = '',
     dragHandleProps,
 }: InfoCardProps) {
+    // Fabric search modal state
+    const [showFabricModal, setShowFabricModal] = useState(false);
     const [machine, setMachine] = useState<MachineData | null>(null);
     const [loading, setLoading] = useState(true);
     const [currentFrame, setCurrentFrame] = useState(0);
@@ -364,17 +367,56 @@ export default function InfoCard({
                         >
                             <img src={pencil} alt="Edit" className="w-4 h-4" />
                         </div>
+                        {/* Change Fabric Button */}
+                        {/* <button
+                            className="ml-2 p-1 rounded hover:bg-vs-gray-600 border border-theme-background-five"
+                            onClick={() => setShowFabricModal(true)}
+                        >
+                            Byt tyg
+                        </button> */}
+                        {/* Fabric Search Modal */}
+                        <FabricSearch
+                            open={showFabricModal}
+                            onClose={() => setShowFabricModal(false)}
+                            onSelect={async (fabric) => {
+                                setShowFabricModal(false);
+                                try {
+                                    const res = await fetch(
+                                        `http://192.168.88.118:8080/api/machines/${machine.id}/fabric`,
+                                        {
+                                            method: 'PUT',
+                                            headers: {
+                                                'Content-Type':
+                                                    'application/json',
+                                            },
+                                            body: JSON.stringify({
+                                                article_number:
+                                                    fabric.article_number,
+                                            }),
+                                        }
+                                    );
+                                    if (!res.ok) {
+                                        alert('Failed to change fabric');
+                                    }
+                                } catch {
+                                    alert('Failed to change fabric');
+                                }
+                            }}
+                        />
                     </div>
                 </div>
 
-                <p className="text-theme-font-one text-2xl font-bold">
+                <p className="text-theme-font-one text-2xl font-bold ml-2">
                     {skottPerMeter
                         ? `${(machine.skott_fabric / skottPerMeter).toFixed(
                               2
                           )} m`
                         : '...'}
                 </p>
-                <p className="text-theme-font-two text-xs mt-1">
+                <p
+                    className="text-theme-font-two text-xs mt-1 p-1 pl-2 rounded-md hover:bg-vs-gray-600 hover:cursor-pointer"
+                    onClick={() => setShowFabricModal(true)}
+                >
                     {machine.fabric_id ? (
                         <FabricName
                             fabricId={machine.fabric_id}
@@ -384,7 +426,7 @@ export default function InfoCard({
                         'Inget tyg valt'
                     )}
                 </p>
-                <p className="text-theme-font-three text-xs mt-1">
+                <p className="text-theme-font-three text-xs mt-1 ml-2">
                     Status: {statusInfo.text} | Drift:{' '}
                     {Math.round(
                         (machine.uptime / (machine.uptime + machine.downtime)) *

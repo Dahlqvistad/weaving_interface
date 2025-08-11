@@ -59,8 +59,8 @@ function FabricName({
     }, [fabricId]);
     return `${fabricLabel ?? fabricId}`;
 }
-
-// ...existing code...
+const API_BASE =
+    window.location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
 
 export default function InfoCard({
     machineId,
@@ -375,6 +375,7 @@ export default function InfoCard({
                             Byt tyg
                         </button> */}
                         {/* Fabric Search Modal */}
+
                         <FabricSearch
                             open={showFabricModal}
                             onClose={() => setShowFabricModal(false)}
@@ -382,7 +383,7 @@ export default function InfoCard({
                                 setShowFabricModal(false);
                                 try {
                                     const res = await fetch(
-                                        `http://192.168.88.118:8080/api/machines/${machine.id}/fabric`,
+                                        `${API_BASE}/api/machines/${machine.id}/fabric`,
                                         {
                                             method: 'PUT',
                                             headers: {
@@ -396,10 +397,17 @@ export default function InfoCard({
                                         }
                                     );
                                     if (!res.ok) {
-                                        alert('Failed to change fabric');
+                                        const text = await res.text();
+                                        alert(
+                                            `Failed to change fabric (${res.status}): ${text}`
+                                        );
                                     }
-                                } catch {
-                                    alert('Failed to change fabric');
+                                } catch (e: any) {
+                                    alert(
+                                        `Failed to change fabric: ${
+                                            e?.message || e
+                                        }`
+                                    );
                                 }
                             }}
                         />

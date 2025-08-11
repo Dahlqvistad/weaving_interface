@@ -3,9 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <title>Vävdator</title>
-    <link rel="stylesheet" href="./src/main.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
   </head>
   <body>
-    <script type="module" src="/src/renderer.ts"></script>
+    <div id="root"></div>
+    <!-- dev entry; Vite will rewrite on build -->
+    <script type="module" src="/src/index.tsx"></script>
   </body>
 </html>

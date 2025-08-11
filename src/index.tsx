@@ -1,5 +1,5 @@
 import { createRoot } from 'react-dom/client';
 import App from './layouts/App';
+import './main.css';
 
-const root = createRoot(document.body);
-root.render(<App />);
+createRoot(document.getElementById('root')!).render(<App />);

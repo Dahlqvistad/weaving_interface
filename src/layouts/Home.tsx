@@ -93,7 +93,7 @@ export default function Home() {
                                     height="30"
                                     rx="2"
                                     fill="none"
-                                    stroke-width="1.5"
+                                    strokeWidth="1.5"
                                 />
                             </svg>
                         </div>

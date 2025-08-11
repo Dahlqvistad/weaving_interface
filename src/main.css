@@ -1,7 +1,7 @@
-@import 'handsontable/dist/handsontable.full.min.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
 
 @font-face {
     font-family: 'Menlo';

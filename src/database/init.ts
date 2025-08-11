@@ -1,66 +1,59 @@
-import { db } from './connection';
-import { seedMachines, seedMachineRawData, seedFabrics } from './seed';
+// src/database/init.ts
+import type sqlite3 from 'sqlite3';
+import { openDatabase } from './connection';
+// If you want to seed, keep these imports and make sure seed functions accept (db)
+// import { seedMachines, seedMachineRawData, seedFabrics } from './seed'
 
-export const initDatabase = (): Promise<void> => {
-    return new Promise((resolve, reject) => {
-        const createMachinesTable = `
-      CREATE TABLE IF NOT EXISTS machines (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL,
-        last_active DATETIME DEFAULT CURRENT_TIMESTAMP,
-        ip TEXT NOT NULL,
-        status INTEGER NOT NULL DEFAULT 0, -- 0 = inactive, 1 = active
-        fabric_id INTEGER,
-        skott_idag INTEGER NOT NULL DEFAULT 0,
-        meter_idag INTEGER NOT NULL DEFAULT 0,
-        skott_fabric INTEGER NOT NULL DEFAULT 0,
-        uptime INTEGER NOT NULL DEFAULT 0,
-        downtime INTEGER NOT NULL DEFAULT 0
-      );
-    `;
-
-        const createMachineRawTable = `
-      CREATE TABLE IF NOT EXISTS machine_raw (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        machine_id INTEGER NOT NULL,
-        timestamp TEXT NOT NULL,
-        event_type TEXT NOT NULL,
-        value INTEGER NOT NULL,
-        meta TEXT,
-        FOREIGN KEY(machine_id) REFERENCES machines(id)
-      );
-    `;
-
-        db.serialize(() => {
-            let completedTables = 0;
-            const totalTables = 2; // Changed from 3 to 2
-            let hasError = false;
-
-            const checkCompletion = async (err?: Error) => {
-                if (err && !hasError) {
-                    hasError = true;
-                    reject(err);
-                    return;
-                }
-                completedTables++;
-                if (completedTables === totalTables && !hasError) {
-                    console.log('All database tables created successfully');
-
-                    // Now seed the database if it's empty
-                    try {
-                        // await seedMachines();
-                        // await seedFabrics(); // This will now create JSON file
-                        // await seedMachineRawData();
-                        resolve();
-                    } catch (seedError) {
-                        reject(seedError);
-                    }
-                }
-            };
-
-            db.run(createMachinesTable, checkCompletion);
-            db.run(createMachineRawTable, checkCompletion);
-            // Removed: db.run(createFabricsTable, checkCompletion);
-        });
+// small promise helper
+function run(db: sqlite3.Database, sql: string, params: any[] = []) {
+    return new Promise<void>((resolve, reject) => {
+        db.run(sql, params, (err) => (err ? reject(err) : resolve()));
     });
-};
+}
+
+export async function initDatabase(): Promise<void> {
+    const db = await openDatabase();
+
+    // Ensure FK constraints
+    await run(db, 'PRAGMA foreign_keys = ON');
+
+    const createMachinesTable = `
+    CREATE TABLE IF NOT EXISTS machines (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      last_active DATETIME DEFAULT CURRENT_TIMESTAMP,
+      ip TEXT NOT NULL,
+      status INTEGER NOT NULL DEFAULT 0, -- 0 = inactive, 1 = active
+      fabric_id INTEGER,
+      skott_idag INTEGER NOT NULL DEFAULT 0,
+      meter_idag INTEGER NOT NULL DEFAULT 0,
+      skott_fabric INTEGER NOT NULL DEFAULT 0,
+      uptime INTEGER NOT NULL DEFAULT 0,
+      downtime INTEGER NOT NULL DEFAULT 0
+    );
+  `;
+
+    const createMachineRawTable = `
+    CREATE TABLE IF NOT EXISTS machine_raw (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      machine_id INTEGER NOT NULL,
+      timestamp TEXT NOT NULL,
+      event_type TEXT NOT NULL,
+      value INTEGER NOT NULL,
+      meta TEXT,
+      FOREIGN KEY(machine_id) REFERENCES machines(id)
+    );
+  `;
+
+    await run(db, createMachinesTable);
+    await run(db, createMachineRawTable);
+
+    // ---- Seeding (optional) ----
+    // If your seed functions previously used a global db, refactor them to accept (db: sqlite3.Database)
+    // and then uncomment these lines:
+    // await seedMachines(db)
+    // await seedFabrics(db)
+    // await seedMachineRawData(db)
+
+    // done
+}

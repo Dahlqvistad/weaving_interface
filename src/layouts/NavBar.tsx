@@ -54,32 +54,7 @@ export default function NavBar(settings: { bar_width?: number }) {
                             }`}
                         />
                     </Link>
-                    {/* FileSpreadsheet */}
-                    <Link
-                        to="/spreadsheet"
-                        className="navbar-element relative group"
-                        style={{
-                            width: styles.width,
-                            height: styles.height,
-                        }}
-                    >
-                        {/* Simulate the ::before pseudo-element for the active element */}
-                        <div
-                            className={`navbar-element-active ${
-                                activePage === '/spreadsheet'
-                                    ? 'bg-vs-gray-800'
-                                    : 'bg-transparent'
-                            }`}
-                        ></div>
 
-                        <FileSpreadsheet
-                            className={`navbar-element-icon ${
-                                activePage === '/spreadsheet'
-                                    ? 'text-vs-gray-800'
-                                    : 'text-vs-gray-600'
-                            }`}
-                        />
-                    </Link>
                     {/* Tag */}
                     <Link
                         to="/label"

@@ -236,6 +236,12 @@ ipcMain.handle('fabrics-getAll', async () => {
     }
 });
 
+// Metervara handlers
+ipcMain.handle('metervara-getAll', async () => {
+    const { MetervaraModel } = await import('./database/models/Fabric');
+    return await MetervaraModel.getAll();
+});
+
 // ---------------- WINDOW ----------------
 async function createWindow() {
     log('🪟 Creating browser window...');
@@ -308,6 +314,16 @@ async function boot() {
 }
 
 app.on('ready', () => {
+    // console.log('NODE_ENV:', process.env.NODE_ENV);
+    // if (process.env.NODE_ENV === 'development') {
+    //     const {
+    //         default: installExtension,
+    //         REACT_DEVELOPER_TOOLS,
+    //     } = require('electron-devtools-installer');
+    //     installExtension(REACT_DEVELOPER_TOOLS)
+    //         .then((name: any) => console.log(`Added Extension:  ${name}`))
+    //         .catch((err: any) => console.log('An error occurred: ', err));
+    // }
     void boot();
 });
 

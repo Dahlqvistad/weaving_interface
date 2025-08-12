@@ -27,15 +27,53 @@ export default function FabricSearch({
     const [fabricLoading, setFabricLoading] = useState(false);
     const [selectedFabric, setSelectedFabric] = useState<Fabric | null>(null);
 
+    // WebSocket base (same as InfoCard)
+    const WS_BASE =
+        window.location.protocol === 'file:' ||
+        window.location.protocol === 'http:'
+            ? 'ws://127.0.0.1:8081'
+            : '';
+
+    // Function to load fabric list
+    const loadFabricList = () => {
+        setFabricLoading(true);
+        window.metervaraAPI
+            .getAll()
+            .then((data: Fabric[]) => {
+                setFabricList(Array.isArray(data) ? data : []);
+            })
+            .finally(() => setFabricLoading(false));
+    };
+
     useEffect(() => {
         if (!open) return;
-        setFabricLoading(true);
-        window.fabricsAPI
-            .getAll()
-            .then((data: Fabric[]) =>
-                setFabricList(Array.isArray(data) ? data : [])
-            )
-            .finally(() => setFabricLoading(false));
+        loadFabricList();
+        let ws: WebSocket | null = null;
+        // Listen for database updates via WebSocket
+        ws = new WebSocket(WS_BASE);
+        ws.onmessage = (event) => {
+            try {
+                const message = JSON.parse(event.data);
+                console.log('[FabricSearch] WebSocket message:', message);
+                if (message.type === 'machine_update') {
+                    // Reload fabric list on any machine update
+                    loadFabricList();
+                }
+                if (message.type === 'fabric_update') {
+                    // Reload fabric list on any fabric update
+                    loadFabricList();
+                }
+            } catch (err) {
+                console.warn(
+                    '[FabricSearch] WebSocket parse error:',
+                    err,
+                    event.data
+                );
+            }
+        };
+        return () => {
+            if (ws) ws.close();
+        };
     }, [open]);
 
     const filteredFabrics = fabricList

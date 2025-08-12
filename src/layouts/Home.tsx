@@ -1,7 +1,8 @@
 // Example of a HomePage component in Home.tsx
 import React, { useState, useEffect } from 'react';
-import InfoCard from './InfoCard';
+import InfoCard from './InfoCard/InfoCard';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import AlertComponent from './Alert';
 // import { ReactComponent as grid_4x4 } from '../images/grid-4x4.svg';
 
 export default function Home() {
@@ -478,7 +479,7 @@ export default function Home() {
                 </DragDropContext>
             )}
 
-            {/* Other content */}
+            {/* <AlertComponent text="This is an alert message!" /> */}
         </div>
     );
 }

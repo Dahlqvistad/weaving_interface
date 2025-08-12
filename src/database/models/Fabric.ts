@@ -1,5 +1,6 @@
 import { promises as fs } from 'fs';
 import path from 'path';
+import { app } from 'electron';
 
 export interface FabricData {
     id: number;
@@ -10,9 +11,61 @@ export interface FabricData {
     skott_per_meter: number;
 }
 
-const FABRICS_FILE_PATH = path.join(process.cwd(), 'data', 'fabrics.json');
+// Utility to load parsed_metervara.json from userData
+const PARSED_METERVARA_FILE_PATH = path.join(
+    app.getPath('userData'),
+    'parsed_metervara.json'
+);
+export const MetervaraModel = {
+    getAll: async (): Promise<
+        Array<{ article_number: string; name: string }>
+    > => {
+        try {
+            const data = await fs.readFile(PARSED_METERVARA_FILE_PATH, 'utf-8');
+            return JSON.parse(data);
+        } catch (error) {
+            console.error('Error loading parsed_metervara.json:', error);
+            return [];
+        }
+    },
+};
 
-// Ensure the data directory exists
+// Paths to standard data in project
+const PROJECT_DATA_DIR = path.join(process.cwd(), 'data');
+const STANDARD_FILES = [
+    'fabrics.json',
+    'parsed_metervara.json',
+    'Visma-artiklar-01072024.xlsx',
+];
+
+// Ensure standard files are present in userData dir
+const ensureStandardFiles = async () => {
+    const userDataDir = app.getPath('userData');
+    for (const file of STANDARD_FILES) {
+        const userDataPath = path.join(userDataDir, file);
+        try {
+            await fs.access(userDataPath);
+        } catch {
+            // File missing in userData, copy from project data dir if exists
+            const projectPath = path.join(PROJECT_DATA_DIR, file);
+            try {
+                await fs.access(projectPath);
+                await fs.copyFile(projectPath, userDataPath);
+                console.log(
+                    `[FabricModel] Copied ${file} to userData directory.`
+                );
+            } catch {
+                console.warn(
+                    `[FabricModel] ${file} missing in both userData and project data directory.`
+                );
+            }
+        }
+    }
+};
+
+const FABRICS_FILE_PATH = path.join(app.getPath('userData'), 'fabrics.json');
+
+// Ensure the data directory and standard files exist
 const ensureDataDirectory = async () => {
     const dataDir = path.dirname(FABRICS_FILE_PATH);
     try {
@@ -20,16 +73,20 @@ const ensureDataDirectory = async () => {
     } catch {
         await fs.mkdir(dataDir, { recursive: true });
     }
+    await ensureStandardFiles();
 };
 
 // Load fabrics from JSON file
 const loadFabrics = async (): Promise<FabricData[]> => {
     try {
+        console.log('FABRICS_FILE_PATH:', FABRICS_FILE_PATH);
         await ensureDataDirectory();
         const data = await fs.readFile(FABRICS_FILE_PATH, 'utf-8');
+        // console.log('Loaded fabrics data:', data);
         return JSON.parse(data);
     } catch (error) {
         // If file doesn't exist or is empty, return empty array
+        console.error('Error loading fabrics.json:', error);
         return [];
     }
 };

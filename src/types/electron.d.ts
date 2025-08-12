@@ -31,6 +31,11 @@ declare global {
                 ) => Promise<any[]>;
             };
         };
+        metervaraAPI: {
+            getAll: () => Promise<
+                Array<{ article_number: string | number; name: string }>
+            >;
+        };
     }
 }
 

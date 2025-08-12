@@ -241,6 +241,28 @@ app.get('/api/machines', async (_req, res) => {
     }
 });
 
+// Update machine name
+app.put('/api/machines/:device_id/name', async (req, res) => {
+    try {
+        const deviceId = Number(req.params.device_id);
+        const { name } = req.body;
+        if (!name || typeof name !== 'string' || !name.trim()) {
+            return res.status(400).json({ error: 'Invalid name' });
+        }
+        const machine = await MachineModel.getById(deviceId);
+        if (!machine) {
+            return res.status(404).json({ error: 'Machine not found' });
+        }
+        await MachineModel.update(deviceId, { name: name.trim() });
+        const updated = await MachineModel.getById(deviceId);
+        broadcastMachineUpdate(updated);
+        res.json({ success: true, machine: updated });
+    } catch (err: any) {
+        console.error('PUT /api/machines/:device_id/name failed', err);
+        res.status(500).json({ error: err?.message || 'internal_error' });
+    }
+});
+
 app.get('/api/check-update/:device_id', async (req, res) => {
     const deviceId = req.params.device_id;
     const currentVersion = String(req.query.current_version || '');
@@ -281,6 +303,9 @@ app.put('/api/machines/:device_id/fabric', async (req, res) => {
         const deviceId = Number(req.params.device_id);
         const raw = req.body?.article_number;
 
+        console.log('Change fabric request for deviceId:', deviceId);
+        // console.log('All machines:', await MachineModel.getAll());
+
         // Validate
         const articleNumber = Number(raw);
         if (!Number.isFinite(articleNumber)) {
@@ -314,13 +339,33 @@ app.put('/api/machines/:device_id/fabric', async (req, res) => {
 // ---------- WebSocket (single instance attached to HTTP server) ----------
 
 let wss: WebSocketServer | null = null;
+let wsStandalone: WebSocketServer | null = null;
 
 function broadcastMachineUpdate(payload: any) {
-    if (!wss) return;
     const msg = JSON.stringify({ type: 'machine_update', data: payload });
-    wss.clients.forEach((c) => {
-        if (c.readyState === WebSocket.OPEN) c.send(msg);
-    });
+    if (wss) {
+        wss.clients.forEach((c) => {
+            if (c.readyState === WebSocket.OPEN) c.send(msg);
+        });
+    }
+    if (wsStandalone) {
+        wsStandalone.clients.forEach((c) => {
+            if (c.readyState === WebSocket.OPEN) c.send(msg);
+        });
+    }
+}
+function broadcastFabricUpdate(payload: any) {
+    const msg = JSON.stringify({ type: 'fabric_update', data: payload });
+    if (wss) {
+        wss.clients.forEach((c) => {
+            if (c.readyState === WebSocket.OPEN) c.send(msg);
+        });
+    }
+    if (wsStandalone) {
+        wsStandalone.clients.forEach((c) => {
+            if (c.readyState === WebSocket.OPEN) c.send(msg);
+        });
+    }
 }
 
 // ---------- Start for main.ts ----------
@@ -328,9 +373,13 @@ function broadcastMachineUpdate(payload: any) {
 export async function startHttpServer(): Promise<{
     server: http.Server;
     wss: WebSocketServer;
+    wsStandalone?: WebSocketServer;
 }> {
     const server = http.createServer(app);
     wss = new WebSocketServer({ server });
+
+    // Standalone WebSocket server for frontend updates
+    wsStandalone = new WebSocketServer({ host: '127.0.0.1', port: 8081 });
 
     await new Promise<void>((resolve, reject) => {
         server.once('error', (err) => {
@@ -354,18 +403,44 @@ export async function startHttpServer(): Promise<{
     console.log(`   http://${HOST}:${PORT}/api/health`);
     addrs.forEach((ip) => console.log(`   http://${ip}:${PORT}/api/health`));
 
-    // Log WebSocket URL
+    // Log WebSocket URLs
     console.log(`🔌 WebSocket attached at ws://${HOST}:${PORT}`);
+    console.log(`🔌 Standalone WebSocket at ws://127.0.0.1:8081`);
 
     // Optional: wss connection logs
-    wss.on('connection', (ws) => {
+    wss.on('connection', async (ws) => {
+        // Broadcast fabric update (full list)
+        const { FabricModel } = await import('./database/models/Fabric');
+        const allFabrics = await FabricModel.getAll();
+        broadcastFabricUpdate(allFabrics);
         console.log('Frontend connected to WebSocket');
         ws.on('close', () =>
             console.log('Frontend disconnected from WebSocket')
         );
     });
+    wsStandalone.on('connection', (ws) => {
+        console.log('Frontend connected to standalone WebSocket');
+        ws.on('close', () =>
+            console.log('Frontend disconnected from standalone WebSocket')
+        );
+    });
 
-    return { server, wss };
+    // Broadcast updates to both WebSocket servers
+    const oldBroadcast = broadcastMachineUpdate;
+    globalThis.broadcastMachineUpdate = function (payload: any) {
+        oldBroadcast(payload);
+        if (wsStandalone) {
+            const msg = JSON.stringify({
+                type: 'machine_update',
+                data: payload,
+            });
+            wsStandalone.clients.forEach((c) => {
+                if (c.readyState === WebSocket.OPEN) c.send(msg);
+            });
+        }
+    };
+
+    return { server, wss, wsStandalone };
 }
 
 // Optional export for tests

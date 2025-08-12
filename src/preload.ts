@@ -48,5 +48,9 @@ contextBridge.exposeInMainWorld('dbAPI', {
 
 contextBridge.exposeInMainWorld('fabricsAPI', {
     import: () => ipcRenderer.invoke('fabrics-import'),
-    getAll: () => ipcRenderer.invoke('fabrics-getAll'),
+    getAll: () => ipcRenderer.invoke('fabric-getAll'),
+});
+
+contextBridge.exposeInMainWorld('metervaraAPI', {
+    getAll: () => ipcRenderer.invoke('metervara-getAll'),
 });

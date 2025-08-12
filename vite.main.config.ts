@@ -27,9 +27,6 @@ export default defineConfig((env) => {
         plugins: [pluginHotRestart('restart')],
         define,
         resolve: {
-            alias: {
-                src: path.resolve(__dirname, 'src'),
-            },
             mainFields: ['module', 'jsnext:main', 'jsnext'],
         },
     };

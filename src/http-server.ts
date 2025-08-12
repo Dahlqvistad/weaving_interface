@@ -7,8 +7,11 @@ import path from 'node:path';
 import { WebSocketServer, WebSocket } from 'ws';
 import { app as electronApp } from 'electron'; // alias to avoid clash
 import { MachineRawModel } from './database/models/MachineRaw';
-import { MachineModel } from './database/models/Machine';
-import { LongtimeStorageModel } from './database/models/LongtimeStorage';
+import { MachineData, MachineModel } from './database/models/Machine';
+import {
+    LongtimeStorageData,
+    LongtimeStorageModel,
+} from './database/models/LongtimeStorage';
 
 // ---- Config (env overridable) ----
 const PORT = process.env.PORT ? Number(process.env.PORT) : 8080;
@@ -51,63 +54,10 @@ app.use((req: Request, _res: Response, next) => {
     next();
 });
 
-// ...existing code...
-
-// Scheduled job: aggregate raw data and store hourly summary in longtime_storage
-setInterval(async () => {
-    const now = new Date();
-    now.setMinutes(0, 0, 0); // round down to the hour
-    const hourEnd = now.toISOString();
-    const hourStart = new Date(now.getTime() - 60 * 60 * 1000).toISOString();
-
-    // Aggregate for each machine
-    const machines = await MachineModel.getAll();
-    for (const machine of machines) {
-        // Get raw data for this hour
-        const rawData = await MachineRawModel.getByDateRange(
-            machine.id,
-            hourStart,
-            hourEnd
-        );
-        const total_skott = rawData.reduce((sum, r) => sum + (r.value || 0), 0);
-        const total_meter = rawData.reduce((sum, r) => {
-            let meterValue = 0;
-            if (r.meta) {
-                try {
-                    const metaObj =
-                        typeof r.meta === 'string'
-                            ? JSON.parse(r.meta)
-                            : r.meta;
-                    meterValue = metaObj.meter || 0;
-                } catch {
-                    meterValue = 0;
-                }
-            }
-            return sum + meterValue;
-        }, 0);
-        const uptime = rawData.filter((r) => r.event_type === 'up').length;
-        const downtime = rawData.filter((r) => r.event_type === 'down').length;
-
-        // Store or update summary in longtime_storage
-        await LongtimeStorageModel.createOrUpdate({
-            machine_id: machine.id,
-            hour: hourStart,
-            total_skott,
-            total_meter,
-            uptime,
-            downtime,
-        });
-    }
-
-    // Delete raw data for this hour
-    await MachineRawModel.deleteByDateRange(hourStart, hourEnd);
-
-    console.log(
-        `[LongtimeStorage Job] Hourly summary stored and raw data deleted for ${hourStart}`
-    );
-}, 60 * 60 * 1000); // every hour
+// ---------- Daily reset job (every 24 hours) ----------
 
 setInterval(async () => {
+    console.log('[Daily Reset Job] Running daily reset for all machines');
     const machines = await MachineModel.getAll();
     for (const machine of machines) {
         await MachineModel.update(machine.id, {
@@ -120,6 +70,64 @@ setInterval(async () => {
 }, 24 * 60 * 60 * 1000); // every 24 hours
 
 // ---------- Routes ----------
+interface storageData {
+    machine_id: number;
+    num_skott: number;
+    num_meter: number;
+    fabric_id: number | null;
+    uptime: number;
+    downtime: number;
+}
+
+const saveToLongtimeStorage = async ({
+    storageData,
+    timestamp,
+}: {
+    storageData: storageData;
+    timestamp: string;
+}) => {
+    // At the start of your function:
+    const date = new Date(timestamp);
+    date.setMinutes(0, 0, 0);
+    const time = date.toISOString();
+    // round down to the hour
+
+    if (time == '1970-01-01T01:00:00.000Z') {
+        return;
+    }
+
+    // Assume: storageData contains { machine_id, num_skott, num_meter, fabric_id, driftstatus }
+    // and hour is a string like "2025-08-12T20:00:00.000Z"
+
+    const existing = await LongtimeStorageModel.getByMachineAndHour(
+        storageData.machine_id,
+        time
+    );
+
+    if (existing && existing.fabric_id === storageData.fabric_id) {
+        // Same fabric_id: add values to existing entry
+        await LongtimeStorageModel.createOrUpdate({
+            machine_id: storageData.machine_id,
+            hour: time,
+            total_skott: existing.total_skott + storageData.num_skott,
+            total_meter: existing.total_meter + storageData.num_meter,
+            uptime: existing.uptime + storageData.uptime,
+            downtime: existing.downtime + storageData.downtime,
+            fabric_id: storageData.fabric_id,
+        });
+    } else {
+        // No entry or different fabric_id: create new entry
+        await LongtimeStorageModel.createOrUpdate({
+            machine_id: storageData.machine_id,
+            hour: time,
+            total_skott: storageData.num_skott,
+            total_meter: storageData.num_meter,
+            uptime: storageData.uptime,
+            downtime: storageData.downtime,
+            fabric_id: storageData.fabric_id,
+        });
+    }
+};
 
 app.get('/api/health', (_req, res) => {
     res.json({
@@ -178,6 +186,7 @@ app.post('/api/machine-data', async (req: Request, res: Response) => {
         let newStatus = machine.status;
         let newDowntime = machine.downtime ?? 0;
         let newUptime = machine.uptime ?? 0;
+        let isUptime = false;
 
         if (
             skottPerMeter !== Infinity &&
@@ -187,6 +196,7 @@ app.post('/api/machine-data', async (req: Request, res: Response) => {
         } else if (increment > 0) {
             newStatus = 1;
             newUptime = (machine.uptime ?? 0) + 1;
+            isUptime = true;
         } else {
             const currentTime = new Date(timestamp);
             const fiveMinutesAgo = new Date(
@@ -206,11 +216,24 @@ app.post('/api/machine-data', async (req: Request, res: Response) => {
             } else if (lastZero) {
                 newStatus = 0; // Active
                 newDowntime = (machine.downtime ?? 0) + 1;
+                isUptime = false;
             } else {
                 newStatus = 1; // Inactive but not offline
                 newDowntime = (machine.downtime ?? 0) + 1;
+                isUptime = false;
             }
         }
+
+        const storageData = {
+            machine_id: machine.id,
+            num_skott: increment,
+            num_meter: Number(meterIncrement.toFixed(2)),
+            fabric_id: machine.fabric_id ?? null,
+            uptime: isUptime ? 1 : 0,
+            downtime: isUptime ? 0 : 1,
+        };
+        console.log(timestamp);
+        saveToLongtimeStorage({ storageData, timestamp });
 
         const newMeterIdag = Number(
             ((machine.meter_idag ?? 0) + meterIncrement).toFixed(2)
@@ -405,6 +428,14 @@ app.put('/api/machines/:device_id/fabric', async (req, res) => {
         res.status(500).json({ error: err?.message || 'internal_error' });
     }
 });
+
+app.get('/api/demo', (req, res) => {
+    const now = new Date();
+
+    // saveToLongtimeStorage({ machine_id: 1, hour: now });
+    res.json({ message: 'Demo endpoint' });
+});
+
 // ---------- WebSocket (single instance attached to HTTP server) ----------
 
 let wss: WebSocketServer | null = null;

@@ -33,6 +33,7 @@
     "@types/xlsx": "^0.0.36",
     "@typescript-eslint/eslint-plugin": "^5.62.0",
     "@typescript-eslint/parser": "^5.62.0",
+    "@vitejs/plugin-react": "^5.0.0",
     "autoprefixer": "^10.4.19",
     "electron": "31.2.0",
     "electron-react-devtools": "^0.5.3",
@@ -43,7 +44,8 @@
     "ts-node": "^10.9.2",
     "tsx": "^4.20.3",
     "typescript": "~4.5.4",
-    "vite": "^5.3.3"
+    "vite": "^5.3.3",
+    "vite-plugin-svgr": "^4.3.0"
   },
   "keywords": [],
   "author": {
@@ -59,6 +61,7 @@
     "electron-updater": "^6.6.2",
     "express": "^5.1.0",
     "lucide-react": "^0.408.0",
+    "plugin-react": "^0.0.1-security",
     "react": "^18.3.1",
     "react-beautiful-dnd": "^13.1.1",
     "react-dom": "^18.3.1",
@@ -70,7 +73,6 @@
     "xlsx": "^0.18.5"
   },
   "packagerConfig": {
-  "icon": "src/images/app-icon.icns"
-}
-
+    "icon": "src/images/app-icon.icns"
+  }
 }

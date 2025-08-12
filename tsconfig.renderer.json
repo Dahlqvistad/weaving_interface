@@ -1,0 +1,17 @@
+
+// tsconfig.renderer.json (or your renderer tsconfig)
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "jsx": "react-jsx",
+    "strict": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "baseUrl": ".",
+    "paths": { "src/*": ["src/*"] },
+    "types": ["vite/client"]          // add "vite-plugin-svgr/client" if you use ?react
+  },
+  "include": ["src", "vite-env.d.ts"]
+}

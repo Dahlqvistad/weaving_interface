@@ -8,6 +8,7 @@ export interface LongtimeStorageData {
     total_meter: number;
     uptime: number;
     downtime: number;
+    fabric_id: number;
 }
 
 export const LongtimeStorageModel = {
@@ -31,14 +32,15 @@ export const LongtimeStorageModel = {
     async createOrUpdate(data: Omit<LongtimeStorageData, 'id'>): Promise<void> {
         await run(
             `
-            INSERT INTO longtime_storage (machine_id, hour, total_skott, total_meter, uptime, downtime)
-            VALUES (?, ?, ?, ?, ?, ?)
-            ON CONFLICT(machine_id, hour) DO UPDATE SET
-                total_skott = excluded.total_skott,
-                total_meter = excluded.total_meter,
-                uptime = excluded.uptime,
-                downtime = excluded.downtime
-            `,
+    INSERT INTO longtime_storage (machine_id, hour, total_skott, total_meter, uptime, downtime, fabric_id)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
+    ON CONFLICT(machine_id, hour, fabric_id) DO UPDATE SET
+        total_skott = excluded.total_skott,
+        total_meter = excluded.total_meter,
+        uptime = excluded.uptime,
+        downtime = excluded.downtime,
+        fabric_id = excluded.fabric_id
+    `,
             [
                 data.machine_id,
                 data.hour,
@@ -46,6 +48,7 @@ export const LongtimeStorageModel = {
                 data.total_meter,
                 data.uptime,
                 data.downtime,
+                data.fabric_id,
             ]
         );
     },

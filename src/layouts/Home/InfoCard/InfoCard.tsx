@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import FabricSearch from './InfoCard_fabricsearch';
-import InfoCard_image from './InfoCard_image';
-import pencil from '../../images/pencil.svg';
+
+import pencil from '/src/images/pencil.svg';
+
 import ImageInfoCard from './InfoCard_image';
 
 // Import types and helper

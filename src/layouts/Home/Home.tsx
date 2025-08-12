@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import InfoCard from './InfoCard/InfoCard';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import AlertComponent from './Alert';
+import AlertComponent from '../Global/Alert';
 // import { ReactComponent as grid_4x4 } from '../images/grid-4x4.svg';
 
 export default function Home() {

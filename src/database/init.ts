@@ -30,6 +30,7 @@ export async function initDatabase(): Promise<void> {
       skott_fabric INTEGER NOT NULL DEFAULT 0,
       uptime INTEGER NOT NULL DEFAULT 0,
       downtime INTEGER NOT NULL DEFAULT 0
+
     );
   `;
 
@@ -53,7 +54,10 @@ export async function initDatabase(): Promise<void> {
         total_skott INTEGER DEFAULT 0,
         total_meter REAL DEFAULT 0,
         uptime INTEGER DEFAULT 0,
-        downtime INTEGER DEFAULT 0
+        downtime INTEGER DEFAULT 0,
+        fabric_id INTEGER,
+        FOREIGN KEY(machine_id) REFERENCES machines(id)
+        UNIQUE(machine_id, hour, fabric_id)
     )
     `;
 

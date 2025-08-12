@@ -1,9 +1,15 @@
 import React, { useState } from 'react';
-import NavBar from './NavBar';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Home from './Home';
-import Settings from './Settings';
+import NavBar from './Global/NavBar';
+import {
+    BrowserRouter as Router,
+    Route,
+    Routes,
+    Navigate,
+} from 'react-router-dom';
+import Home from './Home/Home';
+import Settings from './Settings/Settings';
 import Label from './Label';
+import Statistics from './Statistics/Statistics';
 
 export default function App() {
     return (
@@ -12,9 +18,11 @@ export default function App() {
                 <NavBar />
                 <div className="flex-grow overflow-auto bg-theme-background-four">
                     <Routes>
+                        <Route path="*" element={<Navigate to="/" />} />
                         <Route path="/" element={<Home />} />
                         <Route path="/settings" element={<Settings />} />
                         <Route path="/label" element={<Label />} />
+                        <Route path="/statistics" element={<Statistics />} />
                     </Routes>
                 </div>
             </div>

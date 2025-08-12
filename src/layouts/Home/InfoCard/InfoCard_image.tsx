@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import mill_1 from '../../images/loom-animate-1.svg';
-import mill_2 from '../../images/loom-animate-2.svg';
+import mill_1 from '/src/images/loom-animate-1.svg';
+import mill_2 from '/src/images/loom-animate-2.svg';
 
 interface ImageInfoCardProps {
     status: number;

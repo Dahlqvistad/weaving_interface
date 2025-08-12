@@ -10,9 +10,9 @@
     <rect x="70" y="70" width="560" height="560" rx="112" ry="112" fill="#fff" />
 
     <g id="Layer-1">
-        <g transform="translate(90,236) scale(0.802)">
+        <g transform="translate(30,200) scale(1.0)">
+            <!-- <g transform="translate(90,236) scale(0.802)"> -->
 
-            <!-- ...existing SVG content... -->
             <!-- Mill base shape, light green -->
             <rect x="181.96" y="125.487" width="284.383" height="24.542" rx="12" fill="#b6e36c" />
             <path d="M109.625 106.333L164.971 106.333L164.971 194.742L164.971 265.901L109.625 265.901L109.625 106.333Z"
@@ -35,7 +35,7 @@
                 fill-rule="nonzero" opacity="1" stroke="none" />
             <path d="M181.711 211.147L466.093 211.147L466.093 228.995L181.711 228.995L181.711 211.147Z" fill="#d0cdc8"
                 fill-rule="nonzero" opacity="1" stroke="none" />
-            <path d="M181.96 228.995L466.343 228.995L466.343 246.844L181.96 246.844L181.96 228.995Z" fill="#b5b3b1"
+            <!-- <path d="M181.96 228.995L466.343 228.995L466.343 246.844L181.96 246.844L181.96 228.995Z" fill="#b5b3b1"
                 fill-rule="nonzero" opacity="1" stroke="none" />
             <path d="M0 125.487L109.625 125.487L109.625 146.838L0 146.838L0 125.487Z" fill="#49883d" fill-rule="nonzero"
                 opacity="1" stroke="none" />
@@ -53,7 +53,7 @@
             <path d="M63.1476 65.3445L70.7087 65.3445L70.7087 72.9295L63.1476 72.9295L63.1476 65.3445Z" fill="#000000"
                 fill-rule="nonzero" opacity="0" stroke="none" />
             <path d="M63.1476 73.8233L70.7087 73.8233L70.7087 81.4083L63.1476 81.4083L63.1476 73.8233Z" fill="#000000"
-                fill-rule="nonzero" opacity="0" stroke="none" />
+                fill-rule="nonzero" opacity="0" stroke="none" /> -->
             <g opacity="1">
                 <path d="M164.971 65.7966L483.333 65.7966L483.333 125.409L164.971 125.409L164.971 65.7966Z"
                     fill="#4c4c4c" fill-rule="nonzero" opacity="1" stroke="none" />
@@ -66,11 +66,11 @@
                     d="M396.285 19.3908L409.516 19.3908L409.516 37.8207L409.516 56.4571L396.285 56.4571L396.285 47.1091L396.285 19.3908Z"
                     fill="#ce8f43" fill-rule="nonzero" opacity="1" stroke="none" />
             </g>
-            <path d="M68.4549 57.395L74.96 57.395L74.96 63.9213L68.4549 63.9213L68.4549 57.395Z" fill="#24c235"
+            <!-- <path d="M68.4549 57.395L74.96 57.395L74.96 63.9213L68.4549 63.9213L68.4549 57.395Z" fill="#24c235"
                 fill-rule="nonzero" opacity="0" stroke="none" />
             <path d="M58.3492 57.395L64.8543 57.395L64.8543 63.9213L58.3492 63.9213L58.3492 57.395Z" fill="#24c235"
-                fill-rule="nonzero" opacity="0" stroke="none" />
-            <path
+                fill-rule="nonzero" opacity="0" stroke="none" /> -->
+            <!-- <path
                 d="M63.6756 51.6686C63.6756 49.8723 65.1318 48.416 66.9281 48.416L66.9281 48.416C68.7245 48.416 70.1807 49.8723 70.1807 51.6686L70.1807 51.6898C70.1807 53.4861 68.7245 54.9423 66.9281 54.9423L66.9281 54.9423C65.1318 54.9423 63.6756 53.4861 63.6756 51.6898L63.6756 51.6686Z"
                 fill="#eb1c1c" fill-rule="nonzero" opacity="0" stroke="none" />
             <path d="M63.6756 65.8738L70.1807 65.8738L70.1807 72.4001L63.6756 72.4001L63.6756 65.8738Z" fill="#c42d2d"
@@ -80,7 +80,7 @@
             <path d="M7.10543e-15 125.487L109.625 125.487L109.625 136.162L7.10543e-15 136.162L7.10543e-15 125.487Z"
                 fill="#58904d" fill-rule="nonzero" opacity="1" stroke="none" />
             <path d="M538.678 125.487L648.303 125.487L648.303 136.162L538.678 136.162L538.678 125.487Z" fill="#58904d"
-                fill-rule="nonzero" opacity="1" stroke="none" />
+                fill-rule="nonzero" opacity="1" stroke="none" /> -->
         </g>
     </g>
 </svg>

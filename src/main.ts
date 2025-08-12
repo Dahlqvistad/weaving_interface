@@ -1,5 +1,12 @@
 // src/main.ts
-import { app, BrowserWindow, screen, ipcMain, dialog } from 'electron';
+import {
+    app,
+    BrowserWindow,
+    screen,
+    ipcMain,
+    dialog,
+    nativeImage,
+} from 'electron';
 import path from 'node:path';
 import { promises as fs } from 'node:fs'; // ← Promise API (readFile/writeFile/mkdir)
 import * as fss from 'node:fs'; // ← Sync API for appendFileSync/mkdirSync if needed
@@ -131,6 +138,47 @@ ipcMain.handle(
         return MachineRawModel.getByDateRange(machineId, startDate, endDate);
     }
 );
+ipcMain.handle(
+    'machineRaw-deleteByDateRange',
+    async (_event, startDate, endDate) => {
+        const { MachineRawModel } = await import(
+            './database/models/MachineRaw'
+        );
+        return MachineRawModel.deleteByDateRange(startDate, endDate);
+    }
+);
+
+// LongtimeStorage handlers (add after your other dbAPI handlers)
+ipcMain.handle('longtimeStorage-getAll', async () => {
+    const { LongtimeStorageModel } = await import(
+        './database/models/LongtimeStorage'
+    );
+    return LongtimeStorageModel.getAll();
+});
+
+ipcMain.handle(
+    'longtimeStorage-getByMachineAndHour',
+    async (_event, machine_id, hour) => {
+        const { LongtimeStorageModel } = await import(
+            './database/models/LongtimeStorage'
+        );
+        return LongtimeStorageModel.getByMachineAndHour(machine_id, hour);
+    }
+);
+
+ipcMain.handle('longtimeStorage-createOrUpdate', async (_event, data) => {
+    const { LongtimeStorageModel } = await import(
+        './database/models/LongtimeStorage'
+    );
+    return LongtimeStorageModel.createOrUpdate(data);
+});
+
+ipcMain.handle('longtimeStorage-deleteOlderThan', async (_event, hoursAgo) => {
+    const { LongtimeStorageModel } = await import(
+        './database/models/LongtimeStorage'
+    );
+    return LongtimeStorageModel.deleteOlderThan(hoursAgo);
+});
 
 // ---------------- Fabrics import/serve via IPC ----------------
 type Fabric = {
@@ -262,6 +310,7 @@ async function createWindow() {
         },
         titleBarStyle: 'default',
         title: 'Vävdator',
+        icon: path.join(__dirname, '../images/app.icns'),
     });
 
     if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
@@ -311,6 +360,17 @@ async function boot() {
             await createWindow();
         }
     });
+
+    if (process.platform === 'darwin') {
+        const iconPath = app.getAppPath() + '/src/images/app-icon.icns'; // adjust path as needed
+        console.log(iconPath);
+        try {
+            const image = nativeImage.createFromPath(iconPath);
+            app.dock.setIcon(image);
+        } catch (error) {
+            console.error('Error setting app icon:', error);
+        }
+    }
 }
 
 app.on('ready', () => {

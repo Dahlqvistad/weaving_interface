@@ -43,10 +43,23 @@ export async function initDatabase(): Promise<void> {
       meta TEXT,
       FOREIGN KEY(machine_id) REFERENCES machines(id)
     );
+    
   `;
+    const createLongtimeStorage = `
+    CREATE TABLE IF NOT EXISTS longtime_storage (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        machine_id INTEGER NOT NULL,
+        hour TEXT NOT NULL,
+        total_skott INTEGER DEFAULT 0,
+        total_meter REAL DEFAULT 0,
+        uptime INTEGER DEFAULT 0,
+        downtime INTEGER DEFAULT 0
+    )
+    `;
 
     await run(db, createMachinesTable);
     await run(db, createMachineRawTable);
+    await run(db, createLongtimeStorage);
 
     // ---- Seeding (optional) ----
     // If your seed functions previously used a global db, refactor them to accept (db: sqlite3.Database)

@@ -17,6 +17,7 @@ const config: ForgeConfig = {
             unpackDir: '**/node_modules/{sqlite3,better-sqlite3}/**',
         },
         extraResource: ['data'],
+        icon: 'assets/app-icon.icns',
     },
     // hooks: {
     //     // runs early in the pipeline; perfect for generating assets

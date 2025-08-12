@@ -8,6 +8,7 @@ import { WebSocketServer, WebSocket } from 'ws';
 import { app as electronApp } from 'electron'; // alias to avoid clash
 import { MachineRawModel } from './database/models/MachineRaw';
 import { MachineModel } from './database/models/Machine';
+import { LongtimeStorageModel } from './database/models/LongtimeStorage';
 
 // ---- Config (env overridable) ----
 const PORT = process.env.PORT ? Number(process.env.PORT) : 8080;
@@ -50,6 +51,74 @@ app.use((req: Request, _res: Response, next) => {
     next();
 });
 
+// ...existing code...
+
+// Scheduled job: aggregate raw data and store hourly summary in longtime_storage
+setInterval(async () => {
+    const now = new Date();
+    now.setMinutes(0, 0, 0); // round down to the hour
+    const hourEnd = now.toISOString();
+    const hourStart = new Date(now.getTime() - 60 * 60 * 1000).toISOString();
+
+    // Aggregate for each machine
+    const machines = await MachineModel.getAll();
+    for (const machine of machines) {
+        // Get raw data for this hour
+        const rawData = await MachineRawModel.getByDateRange(
+            machine.id,
+            hourStart,
+            hourEnd
+        );
+        const total_skott = rawData.reduce((sum, r) => sum + (r.value || 0), 0);
+        const total_meter = rawData.reduce((sum, r) => {
+            let meterValue = 0;
+            if (r.meta) {
+                try {
+                    const metaObj =
+                        typeof r.meta === 'string'
+                            ? JSON.parse(r.meta)
+                            : r.meta;
+                    meterValue = metaObj.meter || 0;
+                } catch {
+                    meterValue = 0;
+                }
+            }
+            return sum + meterValue;
+        }, 0);
+        const uptime = rawData.filter((r) => r.event_type === 'up').length;
+        const downtime = rawData.filter((r) => r.event_type === 'down').length;
+
+        // Store or update summary in longtime_storage
+        await LongtimeStorageModel.createOrUpdate({
+            machine_id: machine.id,
+            hour: hourStart,
+            total_skott,
+            total_meter,
+            uptime,
+            downtime,
+        });
+    }
+
+    // Delete raw data for this hour
+    await MachineRawModel.deleteByDateRange(hourStart, hourEnd);
+
+    console.log(
+        `[LongtimeStorage Job] Hourly summary stored and raw data deleted for ${hourStart}`
+    );
+}, 60 * 60 * 1000); // every hour
+
+setInterval(async () => {
+    const machines = await MachineModel.getAll();
+    for (const machine of machines) {
+        await MachineModel.update(machine.id, {
+            skott_idag: 0,
+            uptime: 0,
+            downtime: 0,
+        });
+    }
+    console.log('[Daily Reset Job] Reset daily counters for all machines');
+}, 24 * 60 * 60 * 1000); // every 24 hours
+
 // ---------- Routes ----------
 
 app.get('/api/health', (_req, res) => {
@@ -78,19 +147,19 @@ app.post('/api/machine-data', async (req: Request, res: Response) => {
         if (!machine)
             return res.status(404).json({ error: 'Machine not found' });
 
-        const lastActiveDate = new Date(machine.last_active as any)
-            .toISOString()
-            .slice(0, 10);
-        const currentDate = new Date(timestamp).toISOString().slice(0, 10);
+        // const lastActiveDate = new Date(machine.last_active as any)
+        //     .toISOString()
+        //     .slice(0, 10);
+        // const currentDate = new Date(timestamp).toISOString().slice(0, 10);
 
-        // Reset daily counters on date change
-        if (lastActiveDate !== currentDate) {
-            await MachineModel.update(machine_id, {
-                skott_idag: 0,
-                uptime: 0,
-                downtime: 0,
-            });
-        }
+        // // Reset daily counters on date change
+        // if (lastActiveDate !== currentDate) {
+        //     await MachineModel.update(machine_id, {
+        //         skott_idag: 0,
+        //         uptime: 0,
+        //         downtime: 0,
+        //     });
+        // }
 
         // Calculate increments & status
         const increment = typeof value === 'number' ? value : 0;

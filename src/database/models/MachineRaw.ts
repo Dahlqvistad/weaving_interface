@@ -69,4 +69,13 @@ export const MachineRawModel = {
             [machineId, startDate, endDate]
         );
     },
+    deleteByDateRange: async function (
+        startDate: string,
+        endDate: string
+    ): Promise<void> {
+        await run(
+            'DELETE FROM machine_raw WHERE timestamp >= ? AND timestamp < ?',
+            [startDate, endDate]
+        );
+    },
 };

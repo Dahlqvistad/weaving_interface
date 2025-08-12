@@ -36,7 +36,12 @@ declare global {
                 Array<{ article_number: string | number; name: string }>
             >;
         };
+        fabricsAPI: {
+            import(): Promise<{ ok: boolean; count?: number; reason?: string }>;
+            getAll(): Promise<any[]>;
+        };
     }
+    var broadcastMachineUpdate: (payload: any) => void;
 }
 
 export {};

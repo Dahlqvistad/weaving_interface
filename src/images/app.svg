@@ -7,9 +7,11 @@
     xmlns:xlink="http://www.w3.org/1999/xlink">
     <defs />
     <!-- White rounded square background for macOS icon style -->
-    <rect x="0" y="0" width="700" height="700" rx="140" ry="140" fill="#fff" />
+    <rect x="70" y="70" width="560" height="560" rx="112" ry="112" fill="#fff" />
+
     <g id="Layer-1">
-        <g transform="translate(26,217)">
+        <g transform="translate(90,236) scale(0.802)">
+
             <!-- ...existing SVG content... -->
             <!-- Mill base shape, light green -->
             <rect x="181.96" y="125.487" width="284.383" height="24.542" rx="12" fill="#b6e36c" />

@@ -43,6 +43,25 @@ contextBridge.exposeInMainWorld('dbAPI', {
                 startDate,
                 endDate
             ),
+        deleteByDateRange: (startDate: string, endDate: string) =>
+            ipcRenderer.invoke(
+                'machineRaw-deleteByDateRange',
+                startDate,
+                endDate
+            ),
+    },
+    longtimeStorage: {
+        getAll: () => ipcRenderer.invoke('longtimeStorage-getAll'),
+        getByMachineAndHour: (machineId: number, hour: string) =>
+            ipcRenderer.invoke(
+                'longtimeStorage-getByMachineAndHour',
+                machineId,
+                hour
+            ),
+        createOrUpdate: (data: any) =>
+            ipcRenderer.invoke('longtimeStorage-createOrUpdate', data),
+        deleteOlderThan: (hoursAgo: number) =>
+            ipcRenderer.invoke('longtimeStorage-deleteOlderThan', hoursAgo),
     },
 });
 

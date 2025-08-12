@@ -68,5 +68,9 @@
     "sqlite3": "^5.1.7",
     "ws": "^8.18.3",
     "xlsx": "^0.18.5"
-  }
+  },
+  "packagerConfig": {
+  "icon": "src/images/app-icon.icns"
+}
+
 }

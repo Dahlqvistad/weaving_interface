@@ -13,10 +13,6 @@ interface FabricSearchProps {
     onSelect: (fabric: Fabric) => void;
 }
 
-// Works in dev and in packaged app without import.meta
-const API_BASE =
-    window.location.protocol === 'file:' ? 'http://127.0.0.1:8080' : ''; // same-origin in dev
-
 export default function FabricSearch({
     open,
     onClose,

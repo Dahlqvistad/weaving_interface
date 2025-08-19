@@ -25,3 +25,24 @@
 .navbar-element:hover .navbar-element-icon {
     @apply text-vs-gray-800;
 }
+
+/* Style the popup container */
+.react-datepicker {
+  background-color: #374151 !important; /* Tailwind bg-vs-gray-500 */
+  color: #e5e7eb !important;           /* Tailwind text-theme-font-two */
+  border-radius: 0.5rem !important;    /* Tailwind rounded */
+  border: 1px solid #4b5563 !important;/* Tailwind border-vs-gray-600 */
+}
+
+/* Style the header */
+.react-datepicker__header {
+  background-color: #374151 !important; /* Tailwind bg-vs-gray-500 */
+  color: #e5e7eb !important;
+  border-bottom: 1px solid #4b5563 !important;
+}
+
+/* Style the month/year dropdowns */
+.react-datepicker__current-month,
+.react-datepicker__day-name {
+  color: #e5e7eb !important;
+}

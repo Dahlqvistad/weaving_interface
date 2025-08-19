@@ -62,6 +62,13 @@ contextBridge.exposeInMainWorld('dbAPI', {
             ipcRenderer.invoke('longtimeStorage-createOrUpdate', data),
         deleteOlderThan: (hoursAgo: number) =>
             ipcRenderer.invoke('longtimeStorage-deleteOlderThan', hoursAgo),
+        getFiltered: (filters: {
+            fabric_id?: number;
+            machine_id?: number;
+            start?: string;
+            end?: string;
+            sort?: string;
+        }) => ipcRenderer.invoke('longtimeStorage-getFiltered', filters),
     },
 });
 

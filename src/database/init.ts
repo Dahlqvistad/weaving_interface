@@ -50,7 +50,7 @@ export async function initDatabase(): Promise<void> {
     CREATE TABLE IF NOT EXISTS longtime_storage (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         machine_id INTEGER NOT NULL,
-        hour TEXT NOT NULL,
+        time TEXT NOT NULL,
         total_skott INTEGER DEFAULT 0,
         total_meter REAL DEFAULT 0,
         uptime INTEGER DEFAULT 0,

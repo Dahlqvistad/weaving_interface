@@ -1,4 +1,5 @@
 import React, { useRef } from 'react';
+import StatsSection from './Statistics/demo';
 
 const Label: React.FC = () => {
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -14,6 +15,7 @@ const Label: React.FC = () => {
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <StatsSection />
             <label htmlFor="xlsx-upload">Upload XLSX file:</label>
             <input
                 id="xlsx-upload"

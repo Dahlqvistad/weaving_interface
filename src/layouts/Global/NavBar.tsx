@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Settings, FileSpreadsheet, Tag } from 'lucide-react';
+import { Home, Settings, FileSpreadsheet, Tag, LineChart } from 'lucide-react';
 
 export default function NavBar(settings: { bar_width?: number }) {
     const configuration = {
@@ -76,6 +76,32 @@ export default function NavBar(settings: { bar_width?: number }) {
                         <Tag
                             className={`navbar-element-icon ${
                                 activePage === '/label'
+                                    ? 'text-vs-gray-800'
+                                    : 'text-vs-gray-600'
+                            }`}
+                        />
+                    </Link>
+
+                    {/* Statistics */}
+                    <Link
+                        to={'/statistics'}
+                        className="navbar-element relative group"
+                        style={{
+                            width: styles.width,
+                            height: styles.height,
+                        }}
+                    >
+                        <div
+                            className={`navbar-element-active ${
+                                activePage === '/statistics'
+                                    ? 'bg-vs-gray-800'
+                                    : 'bg-transparent'
+                            }`}
+                        ></div>
+
+                        <LineChart
+                            className={`navbar-element-icon ${
+                                activePage === '/statistics'
                                     ? 'text-vs-gray-800'
                                     : 'text-vs-gray-600'
                             }`}

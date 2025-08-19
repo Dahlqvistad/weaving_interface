@@ -56,18 +56,18 @@ app.use((req: Request, _res: Response, next) => {
 
 // ---------- Daily reset job (every 24 hours) ----------
 
-setInterval(async () => {
-    console.log('[Daily Reset Job] Running daily reset for all machines');
-    const machines = await MachineModel.getAll();
-    for (const machine of machines) {
-        await MachineModel.update(machine.id, {
-            skott_idag: 0,
-            uptime: 0,
-            downtime: 0,
-        });
-    }
-    console.log('[Daily Reset Job] Reset daily counters for all machines');
-}, 24 * 60 * 60 * 1000); // every 24 hours
+// setInterval(async () => {
+//     console.log('[Daily Reset Job] Running daily reset for all machines');
+//     const machines = await MachineModel.getAll();
+//     for (const machine of machines) {
+//         await MachineModel.update(machine.id, {
+//             skott_idag: 0,
+//             uptime: 0,
+//             downtime: 0,
+//         });
+//     }
+//     console.log('[Daily Reset Job] Reset daily counters for all machines');
+// }, 24 * 60 * 60 * 1000); // every 24 hours
 
 // ---------- Routes ----------
 interface storageData {
@@ -155,19 +155,21 @@ app.post('/api/machine-data', async (req: Request, res: Response) => {
         if (!machine)
             return res.status(404).json({ error: 'Machine not found' });
 
-        // const lastActiveDate = new Date(machine.last_active as any)
-        //     .toISOString()
-        //     .slice(0, 10);
-        // const currentDate = new Date(timestamp).toISOString().slice(0, 10);
+        const lastActiveDate = new Date(machine.last_active as any)
+            .toISOString()
+            .slice(0, 10);
+        const currentDate = new Date(timestamp).toISOString().slice(0, 10);
 
-        // // Reset daily counters on date change
-        // if (lastActiveDate !== currentDate) {
-        //     await MachineModel.update(machine_id, {
-        //         skott_idag: 0,
-        //         uptime: 0,
-        //         downtime: 0,
-        //     });
-        // }
+        // console.log(lastActiveDate, currentDate);
+
+        // Reset daily counters on date change
+        if (lastActiveDate !== currentDate) {
+            console.log('Reset');
+            machine.skott_idag = 0;
+            machine.meter_idag = 0;
+            machine.uptime = 0;
+            machine.downtime = 0;
+        }
 
         // Calculate increments & status
         const increment = typeof value === 'number' ? value : 0;
@@ -232,7 +234,7 @@ app.post('/api/machine-data', async (req: Request, res: Response) => {
             uptime: isUptime ? 1 : 0,
             downtime: isUptime ? 0 : 1,
         };
-        console.log(timestamp);
+        // console.log(timestamp);
         saveToLongtimeStorage({ storageData, timestamp });
 
         const newMeterIdag = Number(
@@ -429,11 +431,85 @@ app.put('/api/machines/:device_id/fabric', async (req, res) => {
     }
 });
 
-app.get('/api/demo', (req, res) => {
+app.get('/api/demo', async (req, res) => {
+    const filters = req.query;
     const now = new Date();
+    now.setMinutes(0, 0, 0); // round down to the hour
 
-    // saveToLongtimeStorage({ machine_id: 1, hour: now });
-    res.json({ message: 'Demo endpoint' });
+    // Format as ISO string in Stockholm timezone
+    const hour = now
+        .toLocaleString('sv-SE', {
+            timeZone: 'Europe/Stockholm',
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false,
+        })
+        .replace(' ', 'T')
+        .replace(/\./g, '-'); // crude ISO-like format
+
+    console.log(hour);
+
+    // Fetch all rows for verification
+    const allRows = await LongtimeStorageModel.getFiltered(filters);
+    console.log(allRows);
+
+    res.json({
+        message: 'Demo endpoint - test row inserted',
+        allRows,
+    });
+});
+
+// Example Express endpoint
+app.get('/api/longtime-storage', async (req, res) => {
+    const fabric_id = req.query.fabric_id
+        ? Number(req.query.fabric_id)
+        : undefined;
+    const machine_id = req.query.machine_id
+        ? Number(req.query.machine_id)
+        : undefined;
+    const start =
+        typeof req.query.start === 'string' ? req.query.start : undefined;
+    const end = typeof req.query.end === 'string' ? req.query.end : undefined;
+    const sort =
+        typeof req.query.sort === 'string' ? req.query.sort : undefined;
+
+    let query = 'SELECT * FROM longtime_storage WHERE 1=1';
+    const params: any[] = [];
+
+    if (fabric_id) {
+        query += ' AND fabric_id = ?';
+        params.push(fabric_id);
+    }
+    if (machine_id) {
+        query += ' AND machine_id = ?';
+        params.push(machine_id);
+    }
+    if (start) {
+        query += ' AND time >= ?';
+        params.push(start);
+    }
+    if (end) {
+        query += ' AND time <= ?';
+        params.push(end);
+    }
+    if (sort) {
+        query += ` ORDER BY ${sort}`;
+    } else {
+        query += ' ORDER BY time DESC';
+    }
+
+    const rows = await LongtimeStorageModel.getFiltered({
+        fabric_id,
+        machine_id,
+        start,
+        end,
+        sort,
+    });
+    res.json(rows);
 });
 
 // ---------- WebSocket (single instance attached to HTTP server) ----------

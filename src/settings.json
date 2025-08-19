@@ -1,0 +1,17 @@
+{
+    "num_cols": 2,
+    "statistics": 
+    {
+        "filters": {
+            "date": {
+                "start": "2025-01-01",
+                "end": "2025-12-31"
+            },
+            "machine_id": [2],
+            "fabric_id": [5088, 5099],
+            "time_format": "hour"
+
+        }
+
+    }
+}

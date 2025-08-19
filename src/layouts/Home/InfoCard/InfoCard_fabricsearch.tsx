@@ -138,7 +138,7 @@ export default function FabricSearch({
                                     {fabric.name}
                                 </div>
                                 <div className="text-xs text-gray-600">
-                                    Art.nr: {fabric.article_number} | Color:{' '}
+                                    Art.nr: {fabric.article_number} | Color:
                                     {fabric.color} | Width: {fabric.width}
                                 </div>
                             </li>

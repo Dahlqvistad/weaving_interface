@@ -180,6 +180,13 @@ ipcMain.handle('longtimeStorage-deleteOlderThan', async (_event, hoursAgo) => {
     return LongtimeStorageModel.deleteOlderThan(hoursAgo);
 });
 
+ipcMain.handle('longtimeStorage-getFiltered', async (_event, filters) => {
+    const { LongtimeStorageModel } = await import(
+        './database/models/LongtimeStorage'
+    );
+    return LongtimeStorageModel.getFiltered(filters);
+});
+
 // ---------------- Fabrics import/serve via IPC ----------------
 type Fabric = {
     article_number: string | number;
